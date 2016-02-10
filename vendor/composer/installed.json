@@ -1,0 +1,55 @@
+[
+    {
+        "name": "kronusme/dota2-api",
+        "version": "2.1.1",
+        "version_normalized": "2.1.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/kronusme/dota2-api.git",
+            "reference": "9b4142aaa50d008b1d8f4ca6152d2d8f5169871d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/kronusme/dota2-api/zipball/9b4142aaa50d008b1d8f4ca6152d2d8f5169871d",
+            "reference": "9b4142aaa50d008b1d8f4ca6152d2d8f5169871d",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">5.2"
+        },
+        "require-dev": {
+            "phpunit/dbunit": ">=1.2",
+            "phpunit/phpunit": "4.4.*",
+            "satooshi/php-coveralls": "dev-master",
+            "sebastianbergmann/phpcov": "1.1.0",
+            "squizlabs/php_codesniffer": "2.*"
+        },
+        "time": "2015-10-19 20:50:32",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Dota2Api\\": "includes/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "KronuS Me",
+                "email": "kronusme@gmail.com",
+                "homepage": "http://kronus.me",
+                "role": "Developer"
+            }
+        ],
+        "description": "DotA 2 Web API PHP wrapper",
+        "keywords": [
+            "api",
+            "dota2",
+            "sdk",
+            "wrapper"
+        ]
+    }
+]
