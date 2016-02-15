@@ -4,6 +4,8 @@
  * Date: 2016-02-10
  * Time: 15:44
  */
+require_once(dirname(__FILE__) . '/../config.php');
+require_once(dirname(__FILE__) . '/../dbconst.php');
 
 abstract class Repository {
 
