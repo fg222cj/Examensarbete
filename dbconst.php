@@ -18,3 +18,12 @@ define("DBCOLUMNNAME","name");
  */
 define("DBTABLEPLAYERS","players");
 define("DBCOLUMNACCOUNTID","account_id");
+
+/*
+ *  Table: player_ratings
+ */
+define("DBTABLEPLAYERRATINGS", "player_ratings");
+define("DBCOLUMNMATCHID", "match_id");
+define("DBCOLUMNPLAYERID", "player_id");
+define("DBCOLUMNRATEDBYID", "rated_by_id");
+define("DBCOLUMNRATING", "rating");
