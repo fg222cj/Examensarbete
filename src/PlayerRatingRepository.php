@@ -7,6 +7,7 @@
 
 require_once(dirname(__FILE__) . '/Repository.php');
 require_once(dirname(__FILE__) . '/PlayerRating.php');
+require_once(dirname(__FILE__) . '/vendor/autoload.php');
 
 class PlayerRatingRepository extends Repository {
     public function insert(PlayerRating $rating) {
@@ -20,7 +21,7 @@ class PlayerRatingRepository extends Repository {
         $query->execute($params);
     }
 
-    public function getLatestUnratedByPlayerID($playerID) {
+    public function getLatestUnratedMatchIDByPlayerID($playerID) {
         $db = $this->connection();
 
         $sql = "SELECT * FROM " . DBTABLEPLAYERRATINGS . " WHERE " . DBCOLUMNRATEDBYID . "=? AND " . DBCOLUMNRATING . "=0
@@ -31,12 +32,46 @@ class PlayerRatingRepository extends Repository {
         $query->execute($params);
 
         $result = $query->fetchAll();
+
+        $matchMapper = new Dota2Api\Mappers\MatchMapperDb();
+        $matches = array();
+        foreach($result as $row) {
+            $match = $matchMapper->load($row[DBCOLUMNMATCHID]);
+            $matches[] = $match;
+        }
+
+        $matchID = 0;
+        $matchSeqNum = 0;
+        foreach($matches as $match) {
+            if($match->get('match_seq_num') > $matchSeqNum) {
+                $matchSeqNum = $match->get('match_seq_num');
+                $matchID = $match->get('match_id');
+            }
+        }
+        return $matchID;
+    }
+
+    public function getLatestUnratedByPlayerID($playerID) {
+        $db = $this->connection();
+
+        $matchID = $this->getLatestUnratedMatchIDByPlayerID($playerID);
+
+        $sql = "SELECT * FROM " . DBTABLEPLAYERRATINGS . " WHERE " . DBCOLUMNRATEDBYID . "=? AND " . DBCOLUMNMATCHID . "=?";
+        $params = array($playerID, $matchID);
+
+        $query = $db->prepare($sql);
+        $query->execute($params);
+
+        $result = $query->fetchAll();
+
         $ratings = array();
         foreach($result as $row) {
+            if($row[DBCOLUMNRATING] == 0) {
+                return null;
+            }
             $rating = new PlayerRating($row[DBCOLUMNMATCHID], $row[DBCOLUMNPLAYERID], $row[DBCOLUMNRATEDBYID], $row[DBCOLUMNRATING]);
             $ratings[] = $rating;
         }
-
         return $ratings;
     }
 
