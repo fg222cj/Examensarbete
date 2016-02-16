@@ -7,7 +7,7 @@
 
 require_once(dirname(__FILE__) . '/Repository.php');
 require_once(dirname(__FILE__) . '/PlayerRating.php');
-require_once(dirname(__FILE__) . '/vendor/autoload.php');
+require_once(dirname(__FILE__) . '/../vendor/autoload.php');
 
 class PlayerRatingRepository extends Repository {
     public function insert(PlayerRating $rating) {
@@ -21,18 +21,30 @@ class PlayerRatingRepository extends Repository {
         $query->execute($params);
     }
 
-    public function getLatestUnratedMatchIDByPlayerID($playerID) {
+    public function update(PlayerRating $rating) {
         $db = $this->connection();
 
-        $sql = "SELECT * FROM " . DBTABLEPLAYERRATINGS . " WHERE " . DBCOLUMNRATEDBYID . "=? AND " . DBCOLUMNRATING . "=0
-                GROUP BY " . DBCOLUMNMATCHID;
+        $sql = "UPDATE " . DBTABLEPLAYERRATINGS . " SET " . DBCOLUMNRATING . "=? WHERE " . DBCOLUMNMATCHID . "=? AND " .
+                DBCOLUMNPLAYERID . "=? AND " . DBCOLUMNRATEDBYID . "=?";
+        $params = array($rating->getRating(), $rating->getMatchID(), $rating->getPlayerID(), $rating->getRatedByID());
+
+        $query = $db->prepare($sql);
+        $query->execute($params);
+    }
+
+    /*
+     * Fetches the ID of the latest match the player has participated in but not yet rated.
+     */
+    private function getLatestMatchIDByPlayerID($playerID) {
+        $db = $this->connection();
+
+        $sql = "SELECT * FROM " . DBTABLEPLAYERRATINGS . " WHERE " . DBCOLUMNRATEDBYID . "=? GROUP BY " . DBCOLUMNMATCHID;
         $params = array($playerID);
 
         $query = $db->prepare($sql);
         $query->execute($params);
 
         $result = $query->fetchAll();
-
         $matchMapper = new Dota2Api\Mappers\MatchMapperDb();
         $matches = array();
         foreach($result as $row) {
@@ -54,7 +66,8 @@ class PlayerRatingRepository extends Repository {
     public function getLatestUnratedByPlayerID($playerID) {
         $db = $this->connection();
 
-        $matchID = $this->getLatestUnratedMatchIDByPlayerID($playerID);
+        $matchID = $this->getLatestMatchIDByPlayerID($playerID);
+
 
         $sql = "SELECT * FROM " . DBTABLEPLAYERRATINGS . " WHERE " . DBCOLUMNRATEDBYID . "=? AND " . DBCOLUMNMATCHID . "=?";
         $params = array($playerID, $matchID);
@@ -66,7 +79,7 @@ class PlayerRatingRepository extends Repository {
 
         $ratings = array();
         foreach($result as $row) {
-            if($row[DBCOLUMNRATING] == 0) {
+            if($row[DBCOLUMNRATING] != 0) {
                 return null;
             }
             $rating = new PlayerRating($row[DBCOLUMNMATCHID], $row[DBCOLUMNPLAYERID], $row[DBCOLUMNRATEDBYID], $row[DBCOLUMNRATING]);
