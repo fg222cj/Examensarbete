@@ -4,31 +4,31 @@
 
 html {
     overflow-y: scroll;
+    color: #ffffff;
 }
 
 body {
-    background: #363330;
+    background-image: url(Resources/Background.png);
+    background-color: black;
     font-family: 'Titillium Web', sans-serif;
 }
+article{
+    height:500px;
 
+    margin-left: 10%;
+    margin-right: 10%;
+    border: 1px solid gray;
+}
 a {
     text-decoration: none;
-    color: #1b1918;
+    color: rgba(153, 221, 255, 0.2);
     -webkit-transition: .5s ease;
     transition: .5s ease;
 }
 a:hover {
-    color: #1b1918;
+    color: rgb(77, 195, 255);
 }
 
-.form {
-    background: rgba(153, 31, 0, 0.9);
-    padding: 40px;
-    max-width: 600px;
-    margin: 40px auto;
-    border-radius: 4px;
-    box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3);
-}
 
 .tab-group {
     list-style: none;
