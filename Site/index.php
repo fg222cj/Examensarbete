@@ -7,39 +7,58 @@
 
 require_once(dirname(__FILE__) . '/vendor/autoload.php');
 require_once(dirname(__FILE__) . '/../config.php');
-require_once(dirname(__FILE__) . '/Model/PlayerRepository.php');
-require_once(dirname(__FILE__) . '/Model/PlayerRatingRepository.php');
+require_once(dirname(__FILE__) . "/Controller/HandleLogin.php");
+
+session_start();
 
 use Dota2Api\Api;
 
 Api::init(STEAMAPIKEY, array(DBHOST, DBUSERNAME, DBPASSWORD, DBDATABASE, ''));
 
+//Autoclear cache
+header("Expires: Tue, 01 Jan 2000 00:00:00 GMT");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
-$playerRepository = new PlayerRepository();
-$playerRatingRepository = new PlayerRatingRepository();
-$accountID = 53869596;
-$player = $playerRepository->getByAccountID($accountID);
 
-if(isset($_POST['players'])) {
-    $ratedPlayers = $_POST['players'];
-    foreach($ratedPlayers as $ratedPlayer) {
-        $ratingInputName = "rating_" . $ratedPlayer;
-        $rating = new PlayerRating($_POST['match_id'], $ratedPlayer, $player->getID(), $_POST[$ratingInputName]);
-        $playerRatingRepository->update($rating);
+$openID = new LightOpenID("http://gillenius.dlinkddns.com/");
+$index = new Login();
+$index->setOpenId($openID);
+
+//If not successfully authenticated
+if (!$openID->mode) {
+
+    //If button pressed
+    if (isset($_GET['login'])) {
+        $index->hasButtonBeenPressed();
     }
+    //If button pressed
+    if (isset($_GET['logout'])) {
+        $index->ifLogout();
+    }
+
+    if (!isset($_SESSION['T2SteamAuth'])) {
+        echo $index->ifNotLoggedIn();
+    }
+
+}
+//If authenticated
+elseif ($openID->mode == "cancel") {
+    echo "user has cancelled Authentication.";
+} else {
+    if (!isset($_SESSION['T2SteamAuth'])) {
+        $index->writeToFile();
+    }
+}
+//If player logged in present logout button and the players profile
+if (isset($_SESSION['T2SteamAuth'])) {
+    echo $index->ifLoggedInPresentLogoutBtn();
+    echo $index->ifLoggedInPresentPlayerInformation();
 }
 
 
+
+
 ?>
-<html>
-    <head>
-        <title>Testar ratings</title>
-        <script language="javascript" type="text/javascript" src="../jquery-2.1.4.min.js"></script>
-        <script language="javascript" type="text/javascript" src="../update.js"></script>
-    </head>
-    <body>
-        <input type='hidden' name='account_id' value='<?php echo $accountID ?>'/>
-        <h1>Ratings</h1>
-        <div id="ratings"></div>
-    </body>
-</html>

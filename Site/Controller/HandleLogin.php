@@ -1,6 +1,8 @@
 <?php
 require_once(dirname(__FILE__) . "/../Model/UserInformation.php");
 require_once(dirname(__FILE__) . "/../Model/UserInformationRepository.php");
+require_once(dirname(__FILE__) . '/../Model/PlayerRepository.php');
+require_once(dirname(__FILE__) . '/../Model/PlayerRatingRepository.php');
 include(dirname(__FILE__) . "/openid.php");
 
 
@@ -67,7 +69,7 @@ class Login
             $this->Steam64 = str_replace("http://steamcommunity.com/openid/id", "", $_SESSION['T2SteamAuth']);
             $profile = $this->get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$this->Steam64}");
 
-            $buffer = fopen("../Resources/{$this->Steam64}ID.json", "w+");
+            $buffer = fopen("Resources/{$this->Steam64}ID.json", "w+");
             fwrite($buffer, $profile);
             fclose($buffer);
 
@@ -105,7 +107,7 @@ class Login
      */
     function matchHistory($accID){
         $matchHistory = file_get_contents("https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?key={$this->key}&account_id={$accID}");
-        $buffer2 = fopen("../Resources/Match_history.json", "w+");
+        $buffer2 = fopen("Resources/Match_history.json", "w+");
         fwrite($buffer2, $matchHistory);
         fclose($buffer2);
     }
@@ -116,7 +118,7 @@ class Login
     function playerInfo($steamID){
         $profile = $this->get_contents("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$steamID}");
         $profile .=",";
-        $buffer = fopen("../Resources/Players.json", "a+");
+        $buffer = fopen("Resources/Players.json", "a+");
         fwrite($buffer, $profile);
         fclose($buffer);
     }
@@ -125,12 +127,15 @@ class Login
      */
     function ifLoggedInPresentPlayerInformation()
     {
+        $playerRepository = new PlayerRepository();
+        $playerRatingRepository = new PlayerRatingRepository();
+
         $userinfo = new UserInformation("213123123", "hejsan","hoppas", "adjsh");
         $userRepo = new UserInformationRepository();
         //$userRepo->insert($userinfo);
-        $steam_profile = json_decode(file_get_contents("../Resources/{$_SESSION["T2SteamID64"]}ID.json"));
-        $match_history = json_decode(file_get_contents("../Resources/Match_history.json"));
-        $match_history_players = json_decode(file_get_contents("../Resources/Players.json"));
+        $steam_profile = json_decode(file_get_contents("Resources/{$_SESSION["T2SteamID64"]}ID.json"));
+        $match_history = json_decode(file_get_contents("Resources/Match_history.json"));
+        $match_history_players = json_decode(file_get_contents("Resources/Players.json"));
         $profileUrl = $steam_profile->response->players[0]->profileurl;
         $nickname = $steam_profile->response->players[0]->personaname;
         $avatar = $steam_profile->response->players[0]->avatarfull;
@@ -139,6 +144,16 @@ class Login
 
         $this->matchHistory($accID);
 
+        $player = $playerRepository->getByAccountID($accID);
+
+        if(isset($_POST['players'])) {
+            $ratedPlayers = $_POST['players'];
+            foreach($ratedPlayers as $ratedPlayer) {
+                $ratingInputName = "rating_" . $ratedPlayer;
+                $rating = new PlayerRating($_POST['match_id'], $ratedPlayer, $player->getID(), $_POST[$ratingInputName]);
+                $playerRatingRepository->update($rating);
+            }
+        }
 
         $latestMatchID ="";
         for($i = 0; $i <= 9; $i++){
@@ -153,7 +168,9 @@ class Login
             <!DOCTYPE html>
             <html>
             <head>
-                <link rel=\"stylesheet\"  href=\"../mainCss.css\">
+                <link rel=\"stylesheet\"  href=\"mainCss.css\">
+                <script language=\"javascript\" type=\"text/javascript\" src=\"jquery-2.1.4.min.js\"></script>
+                <script language=\"javascript\" type=\"text/javascript\" src=\"update.js\"></script>
             </head>
             <body>
         <header>
@@ -162,6 +179,9 @@ class Login
 
             <article>
                 <p>
+                    <input type='hidden' name='account_id' value='" .$accID . "'/>
+                    <h1>Ratings</h1>
+                    <div id=\"ratings\"></div>
                     Your profile url : <a target='_blank' href={$profileUrl}>{$profileUrl}</a><br>
                     Your dotabuff url : <a target='_blank' href=http://www.dotabuff.com/players/{$accID}>http://www.dotabuff.com/players/{$accID}</a><br>
 

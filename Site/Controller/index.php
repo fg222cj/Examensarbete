@@ -1,6 +1,6 @@
 <?php
 error_reporting(E_ALL);
-(dirname(__FILE__) . "/HandleLogin.php");
+require_once(dirname(__FILE__) . "/HandleLogin.php");
 //Autoclear cache
 header("Expires: Tue, 01 Jan 2000 00:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");

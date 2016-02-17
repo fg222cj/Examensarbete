@@ -29,6 +29,7 @@ if(isset($_POST['accountID']) && !empty($_POST['accountID'])) {
     $accountID = $_POST['accountID'];
 }
 
+
 $player = $playerRepository->getByAccountID($accountID);
 $ratings = $playerRatingRepository->getLatestUnratedByPlayerID($player->getID());
 
