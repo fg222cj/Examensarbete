@@ -28,6 +28,24 @@ class PlayerRepository extends Repository {
         return $players;
     }
 
+    public function getByID($ID) {
+        $db = $this->connection();
+
+        $sql = "SELECT * FROM " . DBTABLEPLAYERS . " WHERE " . DBCOLUMNID . "=? LIMIT 1";
+        $params = array($ID);
+
+        $query = $db->prepare($sql);
+        $query->execute($params);
+        $result = $query->fetchAll();
+
+        if(isset($result[0][DBCOLUMNID])) {
+            $player = new Player($result[0][DBCOLUMNID], $result[0][DBCOLUMNACCOUNTID], $result[0][DBCOLUMNNAME]);
+            return $player;
+        }
+
+        return null;
+    }
+
     public function getByAccountID($accountID) {
         $db = $this->connection();
 
