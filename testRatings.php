@@ -24,30 +24,21 @@ Api::init(STEAMAPIKEY, array(DBHOST, DBUSERNAME, DBPASSWORD, DBDATABASE, ''));
 
 $playerRepository = new PlayerRepository();
 $playerRatingRepository = new PlayerRatingRepository();
-$player = $playerRepository->getByAccountID(53869596);
 
-if(isset($_POST['players'])) {
-    $ratedPlayers = $_POST['players'];
-    foreach($ratedPlayers as $ratedPlayer) {
-        $ratingInputName = "rating_" . $ratedPlayer;
-        $rating = new PlayerRating($_POST['match_id'], $ratedPlayer, $player->getID(), $_POST[$ratingInputName]);
-        $playerRatingRepository->update($rating);
-    }
+if(isset($_POST['accountID']) && !empty($_POST['accountID'])) {
+    $accountID = $_POST['accountID'];
 }
 
+$player = $playerRepository->getByAccountID($accountID);
 $ratings = $playerRatingRepository->getLatestUnratedByPlayerID($player->getID());
 
-$html = "<html>
-<head>
-<title>Testar ratings</title>
-</head>
-<body>
-<h1>Ratings</h1>";
+$html = "";
 
 if(!empty($ratings)) {
     $html .= "<h2>Match ID: " . $ratings[0]->getMatchID() . "</h2>
-              <form action='testRatings.php' method='post'>
+              <form action='index.php' method='post'>
               <input type='hidden' name='match_id' value='" . $ratings[0]->getMatchID() . "' />";
+
     foreach ($ratings as $rating) {
         $otherPlayer = $playerRepository->getByID($rating->getPlayerID());
         $html .= "<div>
@@ -81,5 +72,6 @@ if(!empty($ratings)) {
 else {
     $html .= "<p>No recent unrated matches, good job!</p>";
 }
-$html .= "</body></html>";
+
 echo $html;
+return $html;
