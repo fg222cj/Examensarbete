@@ -5,7 +5,7 @@
  * Date: 17/02/2016
  * Time: 11:24
  */
-require_once (dirname(__FILE__) . "/../../src/Repository.php");
+require_once(dirname(__FILE__) . "/../../src/Repository.php");
 
 class userInformationRepository  extends Repository
 {
@@ -32,4 +32,6 @@ class userInformationRepository  extends Repository
         $query = $db->prepare($sql);
         $query->execute($params);
     }
+
 }
+
