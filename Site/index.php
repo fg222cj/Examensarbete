@@ -58,6 +58,14 @@ if (isset($_SESSION['T2SteamAuth'])) {
     echo $index->ifLoggedInPresentPlayerInformation();
 }
 
+//If no activity over a week, logout.
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 604800)) {
+    session_unset();
+    session_destroy();
+}
+$_SESSION['LAST_ACTIVITY'] = time(); // update last activity time stamp
+
+
 
 
 
