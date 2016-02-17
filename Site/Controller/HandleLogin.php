@@ -1,4 +1,6 @@
 <?php
+require_once "../Model/UserInformation.php";
+require_once "../Model/UserInformationRepository.php";
 include "openid.php";
 
 
@@ -123,6 +125,9 @@ class Login
      */
     function ifLoggedInPresentPlayerInformation()
     {
+        $userinfo = new UserInformation("213123123", "hejsan","hoppas", "adjsh");
+        $userRepo = new UserInformationRepository();
+        //$userRepo->insert($userinfo);
         $steam_profile = json_decode(file_get_contents("../Resources/{$_SESSION["T2SteamID64"]}ID.json"));
         $match_history = json_decode(file_get_contents("../Resources/Match_history.json"));
         $match_history_players = json_decode(file_get_contents("../Resources/Players.json"));

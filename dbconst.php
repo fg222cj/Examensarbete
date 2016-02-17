@@ -27,3 +27,12 @@ define("DBCOLUMNMATCHID", "match_id");
 define("DBCOLUMNPLAYERID", "player_id");
 define("DBCOLUMNRATEDBYID", "rated_by_id");
 define("DBCOLUMNRATING", "rating");
+
+/*
+ *  Table: jocke_users
+ */
+define("DBTABLEJOCKEUSERS" , "jocke_users");
+define("DBCOLUMNSTEAMID", "steamid");
+define("DBCOLUMNPERSONANAME", "personaname");
+define("DBCOLUMNPROFILEURL", "profileurl");
+define("DBCOLUMNAVATARFULL", "avatarfull");
