@@ -14,9 +14,9 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once(dirname(__FILE__) . '/vendor/autoload.php');
-require_once(dirname(__FILE__) . '/config.php');
-require_once(dirname(__FILE__) . '/src/PlayerRepository.php');
-require_once(dirname(__FILE__) . '/src/PlayerRatingRepository.php');
+require_once(dirname(__FILE__) . '/../config.php');
+require_once(dirname(__FILE__) . '/Model/PlayerRepository.php');
+require_once(dirname(__FILE__) . '/Model/PlayerRatingRepository.php');
 
 use Dota2Api\Api;
 

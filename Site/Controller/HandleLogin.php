@@ -1,7 +1,7 @@
 <?php
-require_once "../Model/UserInformation.php";
-require_once "../Model/UserInformationRepository.php";
-include "openid.php";
+require_once(dirname(__FILE__) . "/../Model/UserInformation.php");
+require_once(dirname(__FILE__) . "/../Model/UserInformationRepository.php");
+include(dirname(__FILE__) . "/openid.php");
 
 
 /**

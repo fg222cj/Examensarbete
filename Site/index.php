@@ -34,8 +34,8 @@ if(isset($_POST['players'])) {
 <html>
     <head>
         <title>Testar ratings</title>
-        <script language="javascript" type="text/javascript" src="jquery-2.1.4.min.js"></script>
-        <script language="javascript" type="text/javascript" src="update.js"></script>
+        <script language="javascript" type="text/javascript" src="../jquery-2.1.4.min.js"></script>
+        <script language="javascript" type="text/javascript" src="../update.js"></script>
     </head>
     <body>
         <input type='hidden' name='account_id' value='<?php echo $accountID ?>'/>
