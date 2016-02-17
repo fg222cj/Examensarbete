@@ -12,6 +12,7 @@ class Login
      * @var
      */
     private $openID;
+    private $Steam64;
     /**
      * @var string
      */
@@ -61,16 +62,12 @@ class Login
         if ($_SESSION['T2SteamAuth'] !== null) {
 
 
-            $Steam64 = str_replace("http://steamcommunity.com/openid/id", "", $_SESSION['T2SteamAuth']);
-            $profile = $this->get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$Steam64}");
+            $this->Steam64 = str_replace("http://steamcommunity.com/openid/id", "", $_SESSION['T2SteamAuth']);
+            $profile = $this->get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$this->Steam64}");
 
-            $items = file_get_contents("http://steamcommunity.com/profiles/{$Steam64}/inventory/json/730/2");
-            $buffer = fopen("../Resources/{$Steam64}.json", "w+");
-            $buffer2 = fopen("../Resources/{$Steam64}i.json", "w+");
+            $buffer = fopen("../Resources/{$this->Steam64}ID.json", "w+");
             fwrite($buffer, $profile);
-            fwrite($buffer2, $items);
             fclose($buffer);
-            fclose($buffer2);
 
         }
 
@@ -96,17 +93,56 @@ class Login
      */
     function ifLoggedInPresentLogoutBtn()
     {
-        return "<div id=\"login\"><a href=\"?logout\">Logout</a></div>";
+        return "<div id=\"login\">
+                 <a href=\"?logout\">Logout</a>
+                </div>";
     }
 
+    /**
+     * @param $accID
+     */
+    function matchHistory($accID){
+        $matchHistory = file_get_contents("https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?key={$this->key}&account_id={$accID}");
+        $buffer2 = fopen("../Resources/Match_history.json", "w+");
+        fwrite($buffer2, $matchHistory);
+        fclose($buffer2);
+    }
+
+    /**
+     * @param $steamID
+     */
+    function playerInfo($steamID){
+        $profile = $this->get_contents("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$steamID}");
+        $profile .=",";
+        $buffer = fopen("../Resources/Players.json", "a+");
+        fwrite($buffer, $profile);
+        fclose($buffer);
+    }
     /**
      * @return string
      */
     function ifLoggedInPresentPlayerInformation()
     {
-        $steam_profile = json_decode(file_get_contents("../Resources/{$_SESSION["T2SteamID64"]}.json"));
+        $steam_profile = json_decode(file_get_contents("../Resources/{$_SESSION["T2SteamID64"]}ID.json"));
+        $match_history = json_decode(file_get_contents("../Resources/Match_history.json"));
+        $match_history_players = json_decode(file_get_contents("../Resources/Players.json"));
+        $profileUrl = $steam_profile->response->players[0]->profileurl;
+        $nickname = $steam_profile->response->players[0]->personaname;
+        $avatar = $steam_profile->response->players[0]->avatarfull;
+        $avatars = "";
         $accID = $this->calculateAccountID($steam_profile->response->players[0]->steamid);
 
+        $this->matchHistory($accID);
+
+
+        $latestMatchID ="";
+        for($i = 0; $i <= 9; $i++){
+            $steamID = $this->calculateSteamID($match_history->result->matches[0]->players[$i]->account_id);
+            $this->playerInfo($steamID);
+
+            $latestMatchID .=  nl2br("\n".$match_history_players->response->players[$i]->steamid . " : " . $match_history->result->matches[0]->players[$i]->hero_id);
+        }
+        // "<img src=\"{$match_history_players->response->players[0]->account_id}\" width=60px height=60px/>"
         return
             "
             <!DOCTYPE html>
@@ -116,25 +152,30 @@ class Login
             </head>
             <body>
         <header>
-        <h1>Welcome {$steam_profile->response->players[0]->personaname} <img src=\"{$steam_profile->response->players[0]->avatarfull}\" width=60px height=60px/></h1>
+        <h1>Welcome {$nickname} <img src=\"{$avatar}\" width=60px height=60px/></h1>
         </header>
 
             <article>
-
-
                 <p>
-                    Your profile url : <a target='_blank' href={$steam_profile->response->players[0]->profileurl}>{$steam_profile->response->players[0]->profileurl}</a><br>
+                    Your profile url : <a target='_blank' href={$profileUrl}>{$profileUrl}</a><br>
                     Your dotabuff url : <a target='_blank' href=http://www.dotabuff.com/players/{$accID}>http://www.dotabuff.com/players/{$accID}</a><br>
+
+                    Latest match : $latestMatchID
+
+
 
                 </p>
  </article>
             </body>
 
         ";
-//</html><a href=\"../myProfile.php\"><img src=\"{$steam_profile->response->players[0]->avatarfull}\" width=60px height=60px/></a>
+
     }
     function calculateAccountID($steam64){
         return $steam64 - 76561197960265728;
+    }
+    function calculateSteamID($steam32){
+        return $steam32 + 76561197960265728;
     }
     /**
      * If user not logged in present login button
@@ -142,6 +183,8 @@ class Login
      */
     function ifNotLoggedIn()
     {
-        return "<div id=\"login\"><a href=\"?login\"><img src=\"http://cdn.steamcommunity.com/public/images/signinthroughsteam/sits_small.png\"/></a></div>";
+        return "<div id=\"login\">
+                    <a href=\"?login\"><img src=\"http://cdn.steamcommunity.com/public/images/signinthroughsteam/sits_small.png\"/></a>
+               </div>";
     }
 }
