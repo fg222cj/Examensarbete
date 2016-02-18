@@ -11,13 +11,13 @@ class userInformation
     private $steamID;
     private $personaname;
     private $profileurl;
-    private $avatarfull;
+    private $avatarFull;
 
-    public function __construct($steamID, $personaname, $profileurl, $avatarfull) {
+    public function __construct($steamID, $personaname, $profileUrl, $avatarFull) {
         $this->steamID = $steamID;
         $this->personaname = $personaname;
-        $this->profileurl = $profileurl;
-        $this->avatarfull = $avatarfull;
+        $this->profileurl = $profileUrl;
+        $this->avatarfull = $avatarFull;
     }
 
 
@@ -56,7 +56,7 @@ class userInformation
     /**
      * @return mixed
      */
-    public function getProfileurl()
+    public function getProfileUrl()
     {
         return $this->profileurl;
     }
@@ -72,7 +72,7 @@ class userInformation
     /**
      * @return mixed
      */
-    public function getAvatarfull()
+    public function getAvatarFull()
     {
         return $this->avatarfull;
     }

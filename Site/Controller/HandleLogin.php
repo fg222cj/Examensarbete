@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . "/../Model/UserInformation.php");
 require_once(dirname(__FILE__) . "/../Model/UserInformationRepository.php");
+require_once(dirname(__FILE__) . "/../Model/MatchHistory.php");
 require_once(dirname(__FILE__) . '/../Model/PlayerRepository.php');
 require_once(dirname(__FILE__) . '/../Model/PlayerRatingRepository.php');
 include(dirname(__FILE__) . "/openid.php");
@@ -16,6 +17,9 @@ class Login
      * @var
      */
     private $openID;
+    /**
+     * @var
+     */
     private $Steam64;
     /**
      * @var string
@@ -65,14 +69,7 @@ class Login
 
         if ($_SESSION['T2SteamAuth'] !== null) {
 
-
             $this->Steam64 = str_replace("http://steamcommunity.com/openid/id", "", $_SESSION['T2SteamAuth']);
-            $profile = $this->get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$this->Steam64}");
-
-            $buffer = fopen("Resources/{$this->Steam64}ID.json", "w+");
-            fwrite($buffer, $profile);
-            fclose($buffer);
-
         }
 
         header("Location: index.php");
@@ -105,23 +102,62 @@ class Login
     /**
      * @param $accID
      */
-    function matchHistory($accID){
-        $matchHistory = file_get_contents("https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?key={$this->key}&account_id={$accID}");
-        $buffer2 = fopen("Resources/Match_history.json", "w+");
-        fwrite($buffer2, $matchHistory);
-        fclose($buffer2);
+    function getMatchHistory($accID, $i){
+
+        $getMatchHistoryFromUrl = file_get_contents("https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?matches_requested=1&key={$this->key}&account_id={$accID}");
+
+        $match_history = json_decode($getMatchHistoryFromUrl);
+        $accountID = $match_history->result->matches[0]->players[$i]->account_id;
+        $playerSlot = $match_history->result->matches[0]->players[$i]->player_slot;
+        $heroID = $match_history->result->matches[0]->players[$i]->hero_id;
+        //$matchHistoryRepo = new MatchHistoryRepository();
+        $matchHistory = new MatchHistory($accountID, $playerSlot, $heroID);
+
+        return $matchHistory;
     }
+
 
     /**
      * @param $steamID
+     * @return mixed
      */
-    function playerInfo($steamID){
-        $profile = $this->get_contents("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$steamID}");
-        $profile .=",";
-        $buffer = fopen("Resources/Players.json", "a+");
-        fwrite($buffer, $profile);
-        fclose($buffer);
+    function playerInfo(){
+
+        $profile = $this->get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$_SESSION['T2SteamID64']}");
+
+        $steam_profile = json_decode($profile);
+        $steamid = $steam_profile->response->players[0]->steamid;
+        $profileUrl = $steam_profile->response->players[0]->profileurl;
+        $nickname = $steam_profile->response->players[0]->personaname;
+        $avatar = $steam_profile->response->players[0]->avatarfull;
+        $userRepo = new UserInformationRepository();
+        $userinfo = new UserInformation($steamid, $nickname, $profileUrl, $avatar);
+        //$userRepo->insert($userinfo);
+        return  $userinfo;
     }
+    function getPlayersInfo($playersSteamID){
+
+        $profile = $this->get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$playersSteamID}");
+
+        $steam_profile = json_decode($profile);
+
+            $avatar = $steam_profile->response->players[0]->avatarfull;
+
+        if(is_null($avatar)){
+            $userinfo = new UserInformation("Anonymous", "Anonymous", "Anonymous", "Anonymous");
+            return $userinfo;
+        }
+            $steamid = $steam_profile->response->players[0]->steamid;
+            $profileUrl = $steam_profile->response->players[0]->profileurl;
+            $nickname = $steam_profile->response->players[0]->personaname;
+
+        $userRepo = new UserInformationRepository();
+        $userinfo = new UserInformation($steamid, $nickname, $profileUrl, $avatar);
+        //$userRepo->insert($userinfo);
+
+        return  $userinfo;
+    }
+
     /**
      * @return string
      */
@@ -130,22 +166,12 @@ class Login
         $playerRepository = new PlayerRepository();
         $playerRatingRepository = new PlayerRatingRepository();
 
-        $userinfo = new UserInformation("213123123", "hejsan","hoppas", "adjsh");
-        $userRepo = new UserInformationRepository();
-        //$userRepo->insert($userinfo);
-        $steam_profile = json_decode(file_get_contents("Resources/{$_SESSION["T2SteamID64"]}ID.json"));
-        $match_history = json_decode(file_get_contents("Resources/Match_history.json"));
-        $match_history_players = json_decode(file_get_contents("Resources/Players.json"));
-        $profileUrl = $steam_profile->response->players[0]->profileurl;
-        $nickname = $steam_profile->response->players[0]->personaname;
-        $avatar = $steam_profile->response->players[0]->avatarfull;
-        $avatars = "";
-        $accID = $this->calculateAccountID($steam_profile->response->players[0]->steamid);
+        $playerinfo = $this->playerInfo();
+        $accID = $this->calculateAccountID($playerinfo->getSteamID());
 
-        $this->matchHistory($accID);
+
 
         $player = $playerRepository->getByAccountID($accID);
-
         if(isset($_POST['players'])) {
             $ratedPlayers = $_POST['players'];
             foreach($ratedPlayers as $ratedPlayer) {
@@ -157,12 +183,20 @@ class Login
 
         $latestMatchID ="";
         for($i = 0; $i <= 9; $i++){
-            $steamID = $this->calculateSteamID($match_history->result->matches[0]->players[$i]->account_id);
-            $this->playerInfo($steamID);
 
-            $latestMatchID .=  nl2br("\n".$match_history_players->response->players[$i]->steamid . " : " . $match_history->result->matches[0]->players[$i]->hero_id);
+            $matchHistory =  $this->GetMatchHistory($accID,$i);
+            $playersSteamID = $this->calculateSteamID($matchHistory->getAccountID());
+
+            $playersFromLastGame = $this->getPlayersInfo($playersSteamID);
+
+            if($playersFromLastGame->getAvatarFull() == "Anonymous") {
+                $latestMatchID .= nl2br("\n" . $playersFromLastGame->getPersonaname() . " : " . $matchHistory->getHeroID());
+            }else{
+                $latestMatchID .= nl2br("\n" . $playersFromLastGame->getPersonaname() . " : <img src=\"{$playersFromLastGame->getAvatarFull()}\" width=60px height=60px/>" . ": " . $matchHistory->getHeroID());
+            }
         }
-        // "<img src=\"{$match_history_players->response->players[0]->account_id}\" width=60px height=60px/>"
+
+//$match_history->result->matches[0]->players[$i]->hero_id
         return
             "
             <!DOCTYPE html>
@@ -174,7 +208,7 @@ class Login
             </head>
             <body>
         <header>
-        <h1>Welcome {$nickname} <img src=\"{$avatar}\" width=60px height=60px/></h1>
+        <h1>Welcome {$playerinfo->getPersonaname()} <img src=\"{$playerinfo->getAvatarFull()}\" width=60px height=60px/></h1>
         </header>
 
             <article>
@@ -182,7 +216,7 @@ class Login
                     <input type='hidden' name='account_id' value='" .$accID . "'/>
                     <h1>Ratings</h1>
                     <div id=\"ratings\"></div>
-                    Your profile url : <a target='_blank' href={$profileUrl}>{$profileUrl}</a><br>
+                    Your profile url : <a target='_blank' href={$playerinfo->getProfileUrl()}>{$playerinfo->getProfileUrl()}</a><br>
                     Your dotabuff url : <a target='_blank' href=http://www.dotabuff.com/players/{$accID}>http://www.dotabuff.com/players/{$accID}</a><br>
 
                     Latest match : $latestMatchID
@@ -196,11 +230,17 @@ class Login
         ";
 
     }
-    function calculateAccountID($steam64){
-        return $steam64 - 76561197960265728;
+
+    /**
+     * @param $steam64
+     * @return mixed
+     */
+    function calculateAccountID(){
+        $steam32 = substr($_SESSION['T2SteamID64'], 1);
+        return $steam32 - 76561197960265728;
     }
-    function calculateSteamID($steam32){
-        return $steam32 + 76561197960265728;
+    function calculateSteamID($steamID32){
+        return $steamID32 + 76561197960265728;
     }
     /**
      * If user not logged in present login button
