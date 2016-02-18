@@ -216,6 +216,8 @@ class Login
                     <input type='hidden' name='account_id' value='" .$accID . "'/>
                     <h1>Ratings</h1>
                     <div id=\"ratings\"></div>
+                    <div class=\"clear\"></div>
+                    Your profile url : <a target='_blank' href={$profileUrl}>{$profileUrl}</a><br>
                     Your profile url : <a target='_blank' href={$playerinfo->getProfileUrl()}>{$playerinfo->getProfileUrl()}</a><br>
                     Your dotabuff url : <a target='_blank' href=http://www.dotabuff.com/players/{$accID}>http://www.dotabuff.com/players/{$accID}</a><br>
 

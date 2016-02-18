@@ -24,23 +24,23 @@ header("Pragma: no-cache");
 
 
 $openID = new LightOpenID("http://gillenius.dlinkddns.com/");
-$index = new Login();
-$index->setOpenId($openID);
+$login = new Login();
+$login->setOpenId($openID);
 
 //If not successfully authenticated
 if (!$openID->mode) {
 
     //If button pressed
     if (isset($_GET['login'])) {
-        $index->hasButtonBeenPressed();
+        $login->hasButtonBeenPressed();
     }
     //If button pressed
     if (isset($_GET['logout'])) {
-        $index->ifLogout();
+        $login->ifLogout();
     }
 
     if (!isset($_SESSION['T2SteamAuth'])) {
-        echo $index->ifNotLoggedIn();
+        echo $login->ifNotLoggedIn();
     }
 
 }
@@ -49,13 +49,13 @@ elseif ($openID->mode == "cancel") {
     echo "user has cancelled Authentication.";
 } else {
     if (!isset($_SESSION['T2SteamAuth'])) {
-        $index->writeToFile();
+        $login->writeToFile();
     }
 }
 //If player logged in present logout button and the players profile
 if (isset($_SESSION['T2SteamAuth'])) {
-    echo $index->ifLoggedInPresentLogoutBtn();
-    echo $index->ifLoggedInPresentPlayerInformation();
+    echo $login->ifLoggedInPresentLogoutBtn();
+    echo $login->ifLoggedInPresentPlayerInformation();
 }
 
 ?>

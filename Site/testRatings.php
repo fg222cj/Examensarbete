@@ -42,30 +42,16 @@ if(!empty($ratings)) {
 
     foreach ($ratings as $rating) {
         $otherPlayer = $playerRepository->getByID($rating->getPlayerID());
-        $html .= "<div>
-              <h3>" . $otherPlayer->getName() . "</h3>
-              <input type='hidden' name='players[]' value='" . $rating->getPlayerID() . "'/>
-              1
-              <input type='radio' name='rating_" . $rating->getPlayerID() . "' value='1'/>
-              2
-              <input type='radio' name='rating_" . $rating->getPlayerID() . "' value='2'/>
-              3
-              <input type='radio' name='rating_" . $rating->getPlayerID() . "' value='3'/>
-              4
-              <input type='radio' name='rating_" . $rating->getPlayerID() . "' value='4'/>
-              5
-              <input type='radio' name='rating_" . $rating->getPlayerID() . "' value='5'/>
-              6
-              <input type='radio' name='rating_" . $rating->getPlayerID() . "' value='6'/>
-              7
-              <input type='radio' name='rating_" . $rating->getPlayerID() . "' value='7'/>
-              8
-              <input type='radio' name='rating_" . $rating->getPlayerID() . "' value='8'/>
-              9
-              <input type='radio' name='rating_" . $rating->getPlayerID() . "' value='9'/>
-              10
-              <input type='radio' name='rating_" . $rating->getPlayerID() . "' value='10'/>
-              </div>";
+        $html .= "<div class='rating-box'>
+                      <h3>" . $otherPlayer->getName() . "</h3>
+                      <input type='hidden' name='players[]' value='" . $rating->getPlayerID() . "'/>";
+        for($i = 10; $i >= 1; $i--) {
+            $html .= "<div class='rating-radio'>
+                      <label for='rating_" . $rating->getPlayerID() . "_" . $i . "'>" . $i . "</label>
+                      <input type='radio' id='rating_" . $rating->getPlayerID() . "_" . $i . "' name='rating_" . $rating->getPlayerID() . "' value='" . $i . "'/>
+                      </div>";
+        }
+        $html .= "</div>";
     }
 
     $html .= "<input type='submit' /></form>";
