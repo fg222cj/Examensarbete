@@ -80,6 +80,10 @@ h1 {
     display: block;
 }
 
+input[type="submit"] {
+    float: left;
+}
+
 .clear {
     clear: both;
 }

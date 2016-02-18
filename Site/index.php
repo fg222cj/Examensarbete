@@ -27,16 +27,23 @@ $openID = new LightOpenID("http://gillenius.dlinkddns.com/");
 $login = new Login();
 $login->setOpenId($openID);
 
+//If logout button pressed
+if (isset($_GET['logout'])) {
+    $login->ifLogout();
+}
+
+//If player logged in present logout button and the players profile
+if ($login->cookieLogin() || (isset($_SESSION['T2SteamAuth']) && !empty($_SESSION['T2SteamAuth']))) {
+    echo $login->ifLoggedInPresentLogoutBtn();
+    echo $login->ifLoggedInPresentPlayerInformation();
+}
+
 //If not successfully authenticated
-if (!$openID->mode) {
+if (!$openID->mode && !$login->cookieLogin()) {
 
     //If button pressed
     if (isset($_GET['login'])) {
         $login->hasButtonBeenPressed();
-    }
-    //If button pressed
-    if (isset($_GET['logout'])) {
-        $login->ifLogout();
     }
 
     if (!isset($_SESSION['T2SteamAuth'])) {
@@ -48,14 +55,9 @@ if (!$openID->mode) {
 elseif ($openID->mode == "cancel") {
     echo "user has cancelled Authentication.";
 } else {
-    if (!isset($_SESSION['T2SteamAuth'])) {
-        $login->writeToFile();
+    if (!isset($_SESSION['T2SteamAuth']) && !$login->cookieLogin()) {
+        $login->storeUserLoginInfo();
     }
-}
-//If player logged in present logout button and the players profile
-if (isset($_SESSION['T2SteamAuth'])) {
-    echo $login->ifLoggedInPresentLogoutBtn();
-    echo $login->ifLoggedInPresentPlayerInformation();
 }
 
 ?>

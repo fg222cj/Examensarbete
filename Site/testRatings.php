@@ -54,7 +54,8 @@ if(!empty($ratings)) {
         $html .= "</div>";
     }
 
-    $html .= "<input type='submit' /></form>";
+    $html .= "<div class=\"clear\"></div>
+              <input type='submit' /></form>";
 }
 else {
     $html .= "<p>No recent unrated matches, good job!</p>";

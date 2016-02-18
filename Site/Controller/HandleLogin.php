@@ -62,18 +62,44 @@ class Login
     /**
      *
      */
-    function writeToFile()
+    function storeUserLoginInfo()
     {
         $_SESSION['T2SteamAuth'] = $this->openID->validate() ? $this->openID->identity : null;
         $_SESSION['T2SteamID64'] = str_replace("http://steamcommunity.com/openid/id", "", $_SESSION['T2SteamAuth']);
 
         if ($_SESSION['T2SteamAuth'] !== null) {
-
             $this->Steam64 = str_replace("http://steamcommunity.com/openid/id", "", $_SESSION['T2SteamAuth']);
         }
 
+        $playerinfo = $this->playerInfo();
+        $accID = $this->calculateAccountID($playerinfo->getSteamID());
+
+        $playerRepository = new PlayerRepository();
+        $player = $playerRepository->getByAccountID($accID);
+        $key = $this->calculateLoginKey();
+        $player->setLoginKey($key);
+        $player->setSteamID64($_SESSION['T2SteamID64']);
+        $playerRepository->storeLoginKey($player);
+        $playerRepository->storeSteamID64($player);
+
+        setcookie("LoginKey", $key, time()+604800);
+
         header("Location: index.php");
 
+    }
+
+    function cookieLogin() {
+        if(isset($_COOKIE['LoginKey'])) {
+            $playerRepository = new PlayerRepository();
+            $players = $playerRepository->getAll();
+            foreach ($players as $player) {
+                if ($player->getLoginKey() == $_COOKIE['LoginKey']) {
+                    $_SESSION['T2SteamID64'] = $player->getSteamID64();
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -82,6 +108,16 @@ class Login
      */
     function ifLogout()
     {
+        // unset cookies
+        if (isset($_SERVER['HTTP_COOKIE'])) {
+            $cookies = explode(';', $_SERVER['HTTP_COOKIE']);
+            foreach($cookies as $cookie) {
+                $parts = explode('=', $cookie);
+                $name = trim($parts[0]);
+                setcookie($name, '', time()-1000);
+                setcookie($name, '', time()-1000, '/');
+            }
+        }
         unset($_SESSION['T2SteamAuth']);
         unset($_SESSION['T2SteamID64']);
         header("Location: index.php");
@@ -217,7 +253,6 @@ class Login
                     <h1>Ratings</h1>
                     <div id=\"ratings\"></div>
                     <div class=\"clear\"></div>
-                    Your profile url : <a target='_blank' href={$profileUrl}>{$profileUrl}</a><br>
                     Your profile url : <a target='_blank' href={$playerinfo->getProfileUrl()}>{$playerinfo->getProfileUrl()}</a><br>
                     Your dotabuff url : <a target='_blank' href=http://www.dotabuff.com/players/{$accID}>http://www.dotabuff.com/players/{$accID}</a><br>
 
@@ -243,6 +278,13 @@ class Login
     }
     function calculateSteamID($steamID32){
         return $steamID32 + 76561197960265728;
+    }
+
+    function calculateLoginKey() {
+        $salt = "JockeOchFabianLoversForLife";
+        $rand = rand(1, 999999999999999999);
+        $key = md5($_SESSION['T2SteamID64'] . $salt . $rand);
+        return $key;
     }
     /**
      * If user not logged in present login button

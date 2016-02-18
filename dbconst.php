@@ -18,6 +18,8 @@ define("DBCOLUMNNAME","name");
  */
 define("DBTABLEPLAYERS","players");
 define("DBCOLUMNACCOUNTID","account_id");
+define("DBCOLUMNSTEAMID64","steam_id_64");
+define("DBCOLUMNLOGINKEY","login_key");
 
 /*
  *  Table: player_ratings

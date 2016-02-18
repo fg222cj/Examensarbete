@@ -21,7 +21,7 @@ class PlayerRepository extends Repository {
         $players = array();
 
         foreach($result as $row) {
-            $player = new Player($row[DBCOLUMNID], $row[DBCOLUMNACCOUNTID], $row[DBCOLUMNNAME]);
+            $player = new Player($row[DBCOLUMNID], $row[DBCOLUMNACCOUNTID], $row[DBCOLUMNNAME], $row[DBCOLUMNSTEAMID64], $row[DBCOLUMNLOGINKEY]);
             $players[] = $player;
         }
 
@@ -39,7 +39,7 @@ class PlayerRepository extends Repository {
         $result = $query->fetchAll();
 
         if(isset($result[0][DBCOLUMNID])) {
-            $player = new Player($result[0][DBCOLUMNID], $result[0][DBCOLUMNACCOUNTID], $result[0][DBCOLUMNNAME]);
+            $player = new Player($result[0][DBCOLUMNID], $result[0][DBCOLUMNACCOUNTID], $result[0][DBCOLUMNNAME], $result[0][DBCOLUMNSTEAMID64], $result[0][DBCOLUMNLOGINKEY]);
             return $player;
         }
 
@@ -57,10 +57,30 @@ class PlayerRepository extends Repository {
         $result = $query->fetchAll();
 
         if(isset($result[0][DBCOLUMNID])) {
-            $player = new Player($result[0][DBCOLUMNID], $result[0][DBCOLUMNACCOUNTID], $result[0][DBCOLUMNNAME]);
+            $player = new Player($result[0][DBCOLUMNID], $result[0][DBCOLUMNACCOUNTID], $result[0][DBCOLUMNNAME], $result[0][DBCOLUMNSTEAMID64], $result[0][DBCOLUMNLOGINKEY]);
             return $player;
         }
 
         return null;
+    }
+
+    public function storeLoginKey(Player $player) {
+        $db = $this->connection();
+
+        $sql = "UPDATE " . DBTABLEPLAYERS . " SET " . DBCOLUMNLOGINKEY . "=? WHERE " . DBCOLUMNID . "=?";
+        $params = array($player->getLoginKey(), $player->getID());
+
+        $query = $db->prepare($sql);
+        $query->execute($params);
+    }
+
+    public function storeSteamID64(Player $player) {
+        $db = $this->connection();
+
+        $sql = "UPDATE " . DBTABLEPLAYERS . " SET " . DBCOLUMNSTEAMID64 . "=? WHERE " . DBCOLUMNID . "=?";
+        $params = array($player->getSteamID64(), $player->getID());
+
+        $query = $db->prepare($sql);
+        $query->execute($params);
     }
 }
