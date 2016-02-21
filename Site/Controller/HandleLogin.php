@@ -4,6 +4,7 @@ require_once(dirname(__FILE__) . "/../Model/UserInformationRepository.php");
 require_once(dirname(__FILE__) . "/../Model/MatchHistory.php");
 require_once(dirname(__FILE__) . '/../Model/PlayerRepository.php');
 require_once(dirname(__FILE__) . '/../Model/PlayerRatingRepository.php');
+require_once(dirname(__FILE__) . '/../Model/HeroRepository.php');
 include(dirname(__FILE__) . "/openid.php");
 
 
@@ -71,8 +72,8 @@ class Login
             $this->Steam64 = str_replace("http://steamcommunity.com/openid/id", "", $_SESSION['T2SteamAuth']);
         }
 
-        $playerinfo = $this->playerInfo();
-        $accID = $this->calculateAccountID($playerinfo->getSteamID());
+        $playerInfo = $this->playerInfo();
+        $accID = $this->calculateAccountID($playerInfo->getSteamID());
 
         $playerRepository = new PlayerRepository();
         $player = $playerRepository->getByAccountID($accID);
@@ -88,6 +89,9 @@ class Login
 
     }
 
+    /**
+     * @return bool
+     */
     function cookieLogin() {
         if(isset($_COOKIE['LoginKey'])) {
             $playerRepository = new PlayerRepository();
@@ -137,6 +141,7 @@ class Login
 
     /**
      * @param $accID
+     * @param $i
      */
     function getMatchHistory($accID, $i){
 
@@ -171,6 +176,11 @@ class Login
         //$userRepo->insert($userinfo);
         return  $userinfo;
     }
+
+    /**
+     * @param $playersSteamID
+     * @return UserInformation
+     */
     function getPlayersInfo($playersSteamID){
 
         $profile = $this->get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$playersSteamID}");
@@ -194,6 +204,7 @@ class Login
         return  $userinfo;
     }
 
+
     /**
      * @return string
      */
@@ -201,11 +212,9 @@ class Login
     {
         $playerRepository = new PlayerRepository();
         $playerRatingRepository = new PlayerRatingRepository();
-
-        $playerinfo = $this->playerInfo();
-        $accID = $this->calculateAccountID($playerinfo->getSteamID());
-
-
+        $heroRep = new HeroRepository();
+        $playerInfo = $this->playerInfo();
+        $accID = $this->calculateAccountID($playerInfo->getSteamID());
 
         $player = $playerRepository->getByAccountID($accID);
         if(isset($_POST['players'])) {
@@ -218,6 +227,8 @@ class Login
         }
 
         $latestMatchID ="";
+
+
         for($i = 0; $i <= 9; $i++){
 
             $matchHistory =  $this->GetMatchHistory($accID,$i);
@@ -226,9 +237,15 @@ class Login
             $playersFromLastGame = $this->getPlayersInfo($playersSteamID);
 
             if($playersFromLastGame->getAvatarFull() == "Anonymous") {
-                $latestMatchID .= nl2br("\n" . $playersFromLastGame->getPersonaname() . " : " . $matchHistory->getHeroID());
+                $latestMatchID .= nl2br("<tr><td>" . "<td width=60px height=60px"
+                    . " <td> "
+                    . " <td> " . $playersFromLastGame->getPersonaname()
+                    . " <td> <img src=\"{$heroRep->getHero($matchHistory->getHeroID())}\"</tr>");
+
             }else{
-                $latestMatchID .= nl2br("\n" . $playersFromLastGame->getPersonaname() . " : <img src=\"{$playersFromLastGame->getAvatarFull()}\" width=60px height=60px/>" . ": " . $matchHistory->getHeroID());
+                $latestMatchID .= nl2br("<tr><td>" . "<td> <img src=\"{$playersFromLastGame->getAvatarFull()}\" width=60px height=60px/>"
+                    . " <td> " . $playersFromLastGame->getPersonaname()
+                    . " <td> <img src=\"{$heroRep->getHero($matchHistory->getHeroID())}\"</tr>");
             }
         }
 
@@ -244,7 +261,7 @@ class Login
             </head>
             <body>
         <header>
-        <h1>Welcome {$playerinfo->getPersonaname()} <img src=\"{$playerinfo->getAvatarFull()}\" width=60px height=60px/></h1>
+        <h1>Welcome {$playerInfo->getPersonaname()} <img src=\"{$playerInfo->getAvatarFull()}\" width=60px height=60px/></h1>
         </header>
 
             <article>
@@ -253,11 +270,12 @@ class Login
                     <h1>Ratings</h1>
                     <div id=\"ratings\"></div>
                     <div class=\"clear\"></div>
-                    Your profile url : <a target='_blank' href={$playerinfo->getProfileUrl()}>{$playerinfo->getProfileUrl()}</a><br>
+                    Your profile url : <a target='_blank' href={$playerInfo->getProfileUrl()}>{$playerInfo->getProfileUrl()}</a><br>
                     Your dotabuff url : <a target='_blank' href=http://www.dotabuff.com/players/{$accID}>http://www.dotabuff.com/players/{$accID}</a><br>
+                    <table style=\"width:40%\">
+                        Latest match : $latestMatchID
 
-                    Latest match : $latestMatchID
-
+                    </table>
 
 
                 </p>
@@ -276,10 +294,18 @@ class Login
         $steam32 = substr($_SESSION['T2SteamID64'], 1);
         return $steam32 - 76561197960265728;
     }
+
+    /**
+     * @param $steamID32
+     * @return mixed
+     */
     function calculateSteamID($steamID32){
         return $steamID32 + 76561197960265728;
     }
 
+    /**
+     * @return string
+     */
     function calculateLoginKey() {
         $salt = "JockeOchFabianLoversForLife";
         $rand = rand(1, 999999999999999999);

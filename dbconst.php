@@ -38,3 +38,11 @@ define("DBCOLUMNSTEAMID", "steamid");
 define("DBCOLUMNPERSONANAME", "personaname");
 define("DBCOLUMNPROFILEURL", "profileurl");
 define("DBCOLUMNAVATARFULL", "avatarfull");
+
+/*
+ *  Table: heroes
+ */
+define("DBTABLEHEROES" , "heroes");
+define("DBCOLUMHEROESNAME", "name");
+define("DBCOLUMNHEROESID", "id");
+define("DBCOLUMNLOCALIZEDNAME", "localized_name");
