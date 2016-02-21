@@ -268,12 +268,11 @@ class Login
                 <p>
                     <input type='hidden' name='account_id' value='" .$accID . "'/>
                     <h1>Ratings</h1>
+                    <h5>Please rate your friends down below. Doing this will make it possible for us to calculate a more precise match making ranking.</h5>
                     <div id=\"ratings\"></div>
                     <div class=\"clear\"></div>
-                    Your profile url : <a target='_blank' href={$playerInfo->getProfileUrl()}>{$playerInfo->getProfileUrl()}</a><br>
-                    Your dotabuff url : <a target='_blank' href=http://www.dotabuff.com/players/{$accID}>http://www.dotabuff.com/players/{$accID}</a><br>
                     <table style=\"width:40%\">
-                        Latest match : $latestMatchID
+                         $latestMatchID
 
                     </table>
 
@@ -285,7 +284,8 @@ class Login
         ";
 
     }
-
+//Your profile url : <a target='_blank' href={$playerInfo->getProfileUrl()}>{$playerInfo->getProfileUrl()}</a><br>
+//Your dotabuff url : <a target='_blank' href=http://www.dotabuff.com/players/{$accID}>http://www.dotabuff.com/players/{$accID}</a><br>
     /**
      * @param $steam64
      * @return mixed
