@@ -34,16 +34,3 @@ class HeroRepository extends Repository
         }
     }
 }
-
-
-//$db = $this->connection();
-//$sql = "SELECT * FROM " . DBTABLEHEROES . " WHERE " . DBCOLUMNHEROESID . "=? LIMIT 1";
-//$params = array(1);
-//
-//$query = $db->prepare($sql);
-//$query->execute($params);
-//$result = $query->fetchAll();
-//
-//$rating = $result[DBCOLUMHEROESNAME];
-//var_dump($rating);
-//return "<img src=\"Resources/Images/abaddon_sb.png\"/>";

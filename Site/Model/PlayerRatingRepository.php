@@ -106,4 +106,24 @@ class PlayerRatingRepository extends Repository {
 
         return $ratings;
     }
+
+//    public function getByPlayerVotes() {
+//        $db = $this->connection();
+//
+//        $sql = "SELECT * FROM " . DBTABLEPLAYERS . " WHERE " . DBCOLUMNRATING . "=? AND " . DBCOLUMNPLAYERID . "=? LIMIT 5";
+//        $params = array();
+//
+//        $query = $db->prepare($sql);
+//        $query->execute($params);
+//        $result = $query->fetchAll();
+//
+//        $ratings = array();
+//        foreach($result as $row) {
+//            $rating = new PlayerRating($row[DBCOLUMNMATCHID], $row[DBCOLUMNPLAYERID], $row[DBCOLUMNRATEDBYID], $row[DBCOLUMNRATING]);
+//            $ratings[] = $rating;
+//        }
+//
+//        return $ratings;
+//    }
+
 }

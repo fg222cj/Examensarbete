@@ -45,7 +45,7 @@ if(!empty($ratings)) {
         $html .= "<div class='rating-box'>
                       <h3>" . $otherPlayer->getName() . "</h3>
                       <input type='hidden' name='players[]' value='" . $rating->getPlayerID() . "'/>";
-        for($i = 10; $i >= 1; $i--) {
+        for($i = 5; $i >= 1; $i--) {
             $html .= "<div class='rating-radio'>
                       <label for='rating_" . $rating->getPlayerID() . "_" . $i . "'>" . $i . "</label>
                       <input type='radio' id='rating_" . $rating->getPlayerID() . "_" . $i . "' name='rating_" . $rating->getPlayerID() . "' value='" . $i . "'/>

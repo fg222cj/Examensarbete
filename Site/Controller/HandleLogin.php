@@ -273,10 +273,7 @@ class Login
                     <div class=\"clear\"></div>
                     <table style=\"width:40%\">
                          $latestMatchID
-
                     </table>
-
-
                 </p>
  </article>
             </body>
