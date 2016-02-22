@@ -11,7 +11,7 @@ include(dirname(__FILE__) . "/openid.php");
 /**
  * Class Login
  */
-class Login
+class HandleLogin
 {
 
     /**
@@ -181,13 +181,13 @@ class Login
      * @param $playersSteamID
      * @return UserInformation
      */
-    function getPlayersInfo($playersSteamID){
+   public function getPlayersInfo($playersSteamID){
 
         $profile = $this->get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$playersSteamID}");
 
         $steam_profile = json_decode($profile);
 
-            $avatar = $steam_profile->response->players[0]->avatarfull;
+        $avatar = $steam_profile->response->players[0]->avatarfull;
 
         if(is_null($avatar)){
             $userinfo = new UserInformation("Anonymous", "Anonymous", "Anonymous", "Anonymous");

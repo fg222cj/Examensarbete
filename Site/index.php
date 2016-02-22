@@ -24,7 +24,7 @@ header("Pragma: no-cache");
 
 
 $openID = new LightOpenID("http://gillenius.dlinkddns.com/");
-$login = new Login();
+$login = new HandleLogin();
 $login->setOpenId($openID);
 
 //If logout button pressed
