@@ -9,6 +9,7 @@ require_once(dirname(__FILE__) . '/Repository.php');
 require_once(dirname(__FILE__) . '/Player.php');
 
 class PlayerRepository extends Repository {
+
     public function getAll() {
         $db = $this->connection();
 

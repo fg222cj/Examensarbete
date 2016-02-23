@@ -17,7 +17,9 @@ require_once(dirname(__FILE__) . '/vendor/autoload.php');
 require_once(dirname(__FILE__) . '/../config.php');
 require_once(dirname(__FILE__) . '/Model/PlayerRepository.php');
 require_once(dirname(__FILE__) . '/Model/PlayerRatingRepository.php');
+require_once(dirname(__FILE__) . '/Model/HeroRepository.php');
 require_once(dirname(__FILE__) . '/Controller/HandleLogin.php');
+
 
 use Dota2Api\Api;
 
@@ -26,6 +28,7 @@ Api::init(STEAMAPIKEY, array(DBHOST, DBUSERNAME, DBPASSWORD, DBDATABASE, ''));
 $playerRepository = new PlayerRepository();
 $playerRatingRepository = new PlayerRatingRepository();
 $handleLogin = new HandleLogin();
+$heroRep = new HeroRepository();
 
 
 if(isset($_POST['accountID']) && !empty($_POST['accountID'])) {
@@ -38,6 +41,9 @@ $ratings = $playerRatingRepository->getLatestUnratedByPlayerID($player->getID())
 
 
 
+//$matchHistory =  $handleLogin->GetMatchHistory($player->getAccountID(),1);
+//$playerInfo = $handleLogin->getPlayerInfo($player->getSteamID64());
+
 $html = "";
 
 if(!empty($ratings)) {
@@ -45,17 +51,14 @@ if(!empty($ratings)) {
               <form action='index.php' method='post'>
               <input type='hidden' name='match_id' value='" . $ratings[0]->getMatchID() . "' />";
 
+
+
     foreach ($ratings as $rating) {
         $otherPlayer = $playerRepository->getByID($rating->getPlayerID());
 
-        $steam64 = $otherPlayer->getSteamID64();
-        $steam64 = substr($steam64, 1);
-        $playerInfo = $handleLogin->getPlayersInfo($steam64);
-
-
         $html .= "<div class='rating-box'>
                       <h3>" . $otherPlayer->getName()."</h3>
-                       <img src=\"{$playerInfo->getAvatarFull()}\" width=60px height=60px/>
+                       <img src=\"{$heroRep->getHero($matchHistory->getHeroID())}\"/>
                       <input type='hidden' name='players[]' value='" . $rating->getPlayerID() . "'/>";
         for($i = 5; $i >= 1; $i--) {
             $html .= "<div class='rating-radio'>
@@ -75,3 +78,8 @@ else {
 
 echo $html;
 return $html;
+//Avatars
+//        $steam64 = $otherPlayer->getSteamID64();
+//        $steam64 = substr($steam64, 1);
+//        $playerInfo = $handleLogin->getPlayersInfo($steam64);
+//        {$playerInfo->getAvatarFull()}

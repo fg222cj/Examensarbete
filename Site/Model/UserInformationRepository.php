@@ -10,18 +10,38 @@ require_once(dirname(__FILE__) . "/Repository.php");
 class userInformationRepository  extends Repository
 {
     public function getAll(){
+
         $db = $this->connection();
         $sql= "SELECT * FROM " . DBTABLEJOCKEUSERS;
 
         $query = $db->prepare($sql);
         $query->execute();
         $result = $query->fetchAll();
-        $userInformation = array();
+        $userInformations = array();
         foreach($result as $row) {
             $userInformation = new UserInformation($row[DBCOLUMNSTEAMID], $row[DBCOLUMNPERSONANAME], $row[DBCOLUMNPROFILEURL], $row[DBCOLUMNAVATARFULL]);
-            $userInformation[] = $userInformation;
+            $userInformations[] = $userInformation;
         }
-        return $userInformation;
+        return $userInformations;
+
+    }
+    public function getUser($steam64){
+
+        $db = $this->connection();
+
+        $sql = "SELECT * FROM " . DBTABLEJOCKEUSERS . " WHERE " . DBCOLUMNSTEAMID . "=? LIMIT 1";
+        $params = array($steam64);
+
+        $query = $db->prepare($sql);
+        $query->execute($params);
+        $result = $query->fetchAll();
+
+        if(isset($result[0][DBCOLUMNSTEAMID])){
+            $userInformation = new UserInformation($result[0][DBCOLUMNSTEAMID], $result[0][DBCOLUMNPERSONANAME], $result[0][DBCOLUMNPROFILEURL], $result[0][DBCOLUMNAVATARFULL]);
+
+            return $userInformation;
+        }
+        return null;
     }
 
     public function insert(UserInformation $userInfo) {

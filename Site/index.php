@@ -36,6 +36,7 @@ if (isset($_GET['logout'])) {
 if ($login->cookieLogin() || (isset($_SESSION['T2SteamAuth']) && !empty($_SESSION['T2SteamAuth']))) {
     echo $login->ifLoggedInPresentLogoutBtn();
     echo $login->ifLoggedInPresentPlayerInformation();
+//    $login->writeToWeka();
 }
 
 //If not successfully authenticated

@@ -5,9 +5,12 @@ require_once(dirname(__FILE__) . "/../Model/MatchHistory.php");
 require_once(dirname(__FILE__) . '/../Model/PlayerRepository.php');
 require_once(dirname(__FILE__) . '/../Model/PlayerRatingRepository.php');
 require_once(dirname(__FILE__) . '/../Model/HeroRepository.php');
+require_once(dirname(__FILE__) . '/../Model/WriteToWeka.php');
 include(dirname(__FILE__) . "/openid.php");
 
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 /**
  * Class Login
  */
@@ -181,7 +184,15 @@ class HandleLogin
      * @param $playersSteamID
      * @return UserInformation
      */
-   public function getPlayersInfo($playersSteamID){
+   public function getPlayerInfo($playersSteamID){
+
+       $userRepo = new UserInformationRepository();
+       $d = $userRepo->getUser($playersSteamID);
+        var_dump($d);
+       return $d;
+
+   }
+    public function setPlayerInfo($playersSteamID){
 
         $profile = $this->get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$playersSteamID}");
 
@@ -193,26 +204,40 @@ class HandleLogin
             $userinfo = new UserInformation("Anonymous", "Anonymous", "Anonymous", "Anonymous");
             return $userinfo;
         }
-            $steamid = $steam_profile->response->players[0]->steamid;
-            $profileUrl = $steam_profile->response->players[0]->profileurl;
-            $nickname = $steam_profile->response->players[0]->personaname;
+        $steamid = $steam_profile->response->players[0]->steamid;
+        $profileUrl = $steam_profile->response->players[0]->profileurl;
+        $nickname = $steam_profile->response->players[0]->personaname;
 
         $userRepo = new UserInformationRepository();
         $userinfo = new UserInformation($steamid, $nickname, $profileUrl, $avatar);
-        //$userRepo->insert($userinfo);
+        $userRepo->insert($userinfo);
 
-        return  $userinfo;
     }
+    function writeToWeka(){
+        $playerRepository = new PlayerRepository();
+        $playerRatingRepository = new PlayerRatingRepository();
+        $writeToWeka = new WriteToWeka();
 
+        if(isset($_POST['accountID']) && !empty($_POST['accountID'])) {
+            $accountID = $_POST['accountID'];
+        }
+        $player = $playerRepository->getByAccountID($accountID);
+        $ratings = $playerRatingRepository->getLatestUnratedByPlayerID($player->getID());
+        foreach($ratings as $rating){
 
+            $writeToWeka->generateFile($player->getName(),  $rating->getRating());
+        }
+    }
     /**
      * @return string
      */
     function ifLoggedInPresentPlayerInformation()
     {
+
         $playerRepository = new PlayerRepository();
         $playerRatingRepository = new PlayerRatingRepository();
         $heroRep = new HeroRepository();
+
         $playerInfo = $this->playerInfo();
         $accID = $this->calculateAccountID($playerInfo->getSteamID());
 
@@ -228,13 +253,13 @@ class HandleLogin
 
         $latestMatchID ="";
 
-
+//EJ tio entries i dbn
         for($i = 0; $i <= 9; $i++){
 
             $matchHistory =  $this->GetMatchHistory($accID,$i);
             $playersSteamID = $this->calculateSteamID($matchHistory->getAccountID());
 
-            $playersFromLastGame = $this->getPlayersInfo($playersSteamID);
+            $playersFromLastGame = $this->getPlayerInfo($playersSteamID);
 
             if($playersFromLastGame->getAvatarFull() == "Anonymous") {
                 $latestMatchID .= nl2br("<tr><td>" . "<td width=60px height=60px"
@@ -248,7 +273,6 @@ class HandleLogin
                     . " <td> <img src=\"{$heroRep->getHero($matchHistory->getHeroID())}\"</tr>");
             }
         }
-
 //$match_history->result->matches[0]->players[$i]->hero_id
         return
             "
