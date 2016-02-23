@@ -69,10 +69,10 @@ class HandleLogin
     function storeUserLoginInfo()
     {
         $_SESSION['T2SteamAuth'] = $this->openID->validate() ? $this->openID->identity : null;
-        $_SESSION['T2SteamID64'] = str_replace("http://steamcommunity.com/openid/id", "", $_SESSION['T2SteamAuth']);
+        $_SESSION['T2SteamID64'] = str_replace("http://steamcommunity.com/openid/id/", "", $_SESSION['T2SteamAuth']);
 
         if ($_SESSION['T2SteamAuth'] !== null) {
-            $this->Steam64 = str_replace("http://steamcommunity.com/openid/id", "", $_SESSION['T2SteamAuth']);
+            $this->Steam64 = str_replace("http://steamcommunity.com/openid/id/", "", $_SESSION['T2SteamAuth']);
         }
 
         $playerInfo = $this->playerInfo();
@@ -166,6 +166,11 @@ class HandleLogin
      * @return mixed
      */
     function playerInfo(){
+        $userinfo = $this->getPlayerInfo($_SESSION['T2SteamID64']);
+        if($userinfo != null) {
+            return $userinfo;
+        }
+
         $profile = $this->get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$_SESSION['T2SteamID64']}");
 
         $steam_profile = json_decode($profile);
@@ -175,7 +180,7 @@ class HandleLogin
         $avatar = $steam_profile->response->players[0]->avatarfull;
         $userRepo = new UserInformationRepository();
         $userinfo = new UserInformation($steamid, $nickname, $profileUrl, $avatar);
-        //$userRepo->insert($userinfo);
+        $userRepo->insert($userinfo);
         return  $userinfo;
     }
 
@@ -185,9 +190,8 @@ class HandleLogin
      */
     public function getPlayerInfo($playersSteamID){
        $userRepo = new UserInformationRepository();
-       $d = $userRepo->getUser($playersSteamID);
-        var_dump($d);
-       return $d;
+       $user = $userRepo->getUser($playersSteamID);
+       return $user;
     }
 
     public function setPlayerInfo($playersSteamID){
@@ -313,8 +317,8 @@ class HandleLogin
      * @return mixed
      */
     function calculateAccountID(){
-        $steam32 = substr($_SESSION['T2SteamID64'], 1);
-        return $steam32 - 76561197960265728;
+        //$steam32 = substr($_SESSION['T2SteamID64'], 1);
+        return $_SESSION['T2SteamID64'] - 76561197960265728;
     }
 
     /**
