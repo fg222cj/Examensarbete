@@ -37,7 +37,8 @@ define("DBTABLEUSERINFORMATION" , "user_information");
 define("DBCOLUMNSTEAMID", "steamid");
 define("DBCOLUMNPERSONANAME", "personaname");
 define("DBCOLUMNPROFILEURL", "profileurl");
-define("DBCOLUMNAVATARFULL", "avatarfull");
+define("DBCOLUMNISPERSONANAMEREAL", "is_personaname_real");
+
 
 /*
  *  Table: heroes

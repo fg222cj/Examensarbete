@@ -18,6 +18,8 @@ require_once(dirname(__FILE__) . '/../config.php');
 require_once(dirname(__FILE__) . '/Model/PlayerRepository.php');
 require_once(dirname(__FILE__) . '/Model/PlayerRatingRepository.php');
 require_once(dirname(__FILE__) . '/Model/HeroRepository.php');
+require_once(dirname(__FILE__) . '/Model/UserInformationRepository.php');
+require_once(dirname(__FILE__) . '/Model/UserInformation.php');
 require_once(dirname(__FILE__) . '/Controller/HandleLogin.php');
 
 
@@ -29,6 +31,7 @@ $playerRepository = new PlayerRepository();
 $playerRatingRepository = new PlayerRatingRepository();
 $handleLogin = new HandleLogin();
 $heroRep = new HeroRepository();
+$userInformationRepository = new UserInformationRepository();
 
 
 if(isset($_POST['accountID']) && !empty($_POST['accountID'])) {

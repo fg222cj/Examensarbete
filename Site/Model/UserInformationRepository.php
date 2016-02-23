@@ -46,9 +46,25 @@ class userInformationRepository  extends Repository
         $db = $this->connection();
         $sql = "INSERT IGNORE INTO " . DBTABLEUSERINFORMATION . " (" . DBCOLUMNSTEAMID . ", " . DBCOLUMNPERSONANAME . ", " .
             DBCOLUMNPROFILEURL . ", " . DBCOLUMNAVATARFULL . ") VALUES (?, ?, ?, ?)";
-        $params = array($userInfo->getSteamID(), $userInfo->getPersonaname(), $userInfo->getProfileurl(), $userInfo->getAvatarfull());
-        $query = $db->prepare($sql);
-        $query->execute($params);
+
+
+        $sqlDuplicate = "SELECT * FROM ".DBTABLEJOCKEUSERS."  WHERE " . DBCOLUMNSTEAMID . " = ?";
+        $paramsDuplicate = array($userInfo);
+        $queryDuplicate = $this->dbConnection->prepare($sqlDuplicate);
+        $queryDuplicate->execute($paramsDuplicate);
+
+        $result = $queryDuplicate->fetch();
+
+        if (strtolower($result[DBCOLUMNSTEAMID]) === strtolower($userInfo->getSteamID())) {
+            return false;
+        }
+        //Otherwise add user
+        else{
+            $params = array($userInfo->getSteamID(), $userInfo->getPersonaname(), $userInfo->getProfileurl(), $userInfo->getAvatarfull());
+            $query = $db->prepare($sql);
+            $query->execute($params);
+            return true;
+        }
     }
 
 }
