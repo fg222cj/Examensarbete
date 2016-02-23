@@ -297,7 +297,15 @@ class HandleLogin
                 <p>
                     <input type='hidden' name='account_id' value='" .$accID . "'/>
                     <h1>Ratings</h1>
-                    <h5>Please rate your friends down below. Doing this will make it possible for us to calculate a more precise match making ranking.</h5>
+                    <p>Rate the performance of your friends down below.</p>
+                    <p>Please try to be objective. For reference, consider this scale:</p>
+                    <ul>
+                    <li>5: Dendi</li>
+                    <li>4: Really good</li>
+                    <li>3: Average</li>
+                    <li>2: Not very good</li>
+                    <li>1: Easy bot[RU]</li>
+                    </ul>
                     <div id=\"ratings\"></div>
                     <div class=\"clear\"></div>
                     <table style=\"width:40%\">
