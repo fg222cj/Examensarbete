@@ -65,12 +65,13 @@ if(!empty($ratings)) {
         }
 
         $html .= "<div class='rating-box'>
-                    <div class='rating-info'>
-                      <h3>" . $otherPlayer->getName()."</h3>";
+                    <div class='rating-info'>";
 
         if(!empty($otherPlayerSlot)) {
             $html .= "<img src=\"{$heroRep->getHero($otherPlayerSlot->get('hero_id'))}\"/>";
         }
+
+        $html .= "<h3>" . $otherPlayer->getName()."</h3>";
 
         $html .= "</div><input type='hidden' name='players[]' value='" . $rating->getPlayerID() . "'/>";
 
