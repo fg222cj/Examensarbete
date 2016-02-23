@@ -39,14 +39,16 @@ if(isset($_POST['accountID']) && !empty($_POST['accountID'])) {
 $player = $playerRepository->getByAccountID($accountID);
 $ratings = $playerRatingRepository->getLatestUnratedByPlayerID($player->getID());
 
-
-
 //$matchHistory =  $handleLogin->GetMatchHistory($player->getAccountID(),1);
 //$playerInfo = $handleLogin->getPlayerInfo($player->getSteamID64());
 
 $html = "";
 
 if(!empty($ratings)) {
+    $matchMapper = new Dota2Api\Mappers\MatchMapperDb();
+    $match = $matchMapper->load($ratings[0]->getMatchID());
+    $slots = $match->getAllSlots();
+
     $html .= "<h2>Match ID: " . $ratings[0]->getMatchID() . "</h2>
               <form action='index.php' method='post' name='rating-form'>
               <input type='hidden' name='match_id' value='" . $ratings[0]->getMatchID() . "' />";
@@ -55,11 +57,21 @@ if(!empty($ratings)) {
 
     foreach ($ratings as $rating) {
         $otherPlayer = $playerRepository->getByID($rating->getPlayerID());
+        $otherPlayerSlot = null;
+        foreach($slots as $slot) {
+            if($slot->get('account_id') == $otherPlayer->getAccountID()) {
+                $otherPlayerSlot = $slot;
+            }
+        }
 
         $html .= "<div class='rating-box'>
-                      <h3>" . $otherPlayer->getName()."</h3>
-                       <img src=\"{$heroRep->getHero($matchHistory->getHeroID())}\"/>
-                      <input type='hidden' name='players[]' value='" . $rating->getPlayerID() . "'/>";
+                      <h3>" . $otherPlayer->getName()."</h3>";
+
+        if(!empty($otherPlayerSlot)) {
+            $html .= "<img src=\"{$heroRep->getHero($otherPlayerSlot->get('hero_id'))}\"/>";
+        }
+
+        $html .= "<input type='hidden' name='players[]' value='" . $rating->getPlayerID() . "'/>";
 
         for ($i = 1; $i <= 5; $i++) {
             $checkedClass = "";

@@ -258,25 +258,25 @@ class HandleLogin
         $latestMatchID ="";
 
 //EJ tio entries i dbn
-        for($i = 0; $i <= 9; $i++){
-
-            $matchHistory =  $this->GetMatchHistory($accID,$i);
-            $playersSteamID = $this->calculateSteamID($matchHistory->getAccountID());
-
-            $playersFromLastGame = $this->getPlayerInfo($playersSteamID);
-
-            if($playersFromLastGame->getAvatarFull() == "Anonymous") {
-                $latestMatchID .= nl2br("<tr><td>" . "<td width=60px height=60px"
-                    . " <td> "
-                    . " <td> " . $playersFromLastGame->getPersonaname()
-                    . " <td> <img src=\"{$heroRep->getHero($matchHistory->getHeroID())}\"</tr>");
-
-            }else{
-                $latestMatchID .= nl2br("<tr><td>" . "<td> <img src=\"{$playersFromLastGame->getAvatarFull()}\" width=60px height=60px/>"
-                    . " <td> " . $playersFromLastGame->getPersonaname()
-                    . " <td> <img src=\"{$heroRep->getHero($matchHistory->getHeroID())}\"</tr>");
-            }
-        }
+//        for($i = 0; $i <= 9; $i++){
+//
+//            $matchHistory =  $this->GetMatchHistory($accID,$i);
+//            $playersSteamID = $this->calculateSteamID($matchHistory->getAccountID());
+//
+//            $playersFromLastGame = $this->getPlayerInfo($playersSteamID);
+//
+//            if($playersFromLastGame->getAvatarFull() == "Anonymous") {
+//                $latestMatchID .= nl2br("<tr><td>" . "<td width=60px height=60px"
+//                    . " <td> "
+//                    . " <td> " . $playersFromLastGame->getPersonaname()
+//                    . " <td> <img src=\"{$heroRep->getHero($matchHistory->getHeroID())}\"</tr>");
+//
+//            }else{
+//                $latestMatchID .= nl2br("<tr><td>" . "<td> <img src=\"{$playersFromLastGame->getAvatarFull()}\" width=60px height=60px/>"
+//                    . " <td> " . $playersFromLastGame->getPersonaname()
+//                    . " <td> <img src=\"{$heroRep->getHero($matchHistory->getHeroID())}\"</tr>");
+//            }
+//        }
 //$match_history->result->matches[0]->players[$i]->hero_id
         return
             "
