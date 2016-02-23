@@ -6,7 +6,7 @@ $(document).ready(setEvents);
 var form = new Form();
 function setEvents() {
     update();
-    setInterval(update, 5000);
+    setInterval(update, 1000);
 }
 
 function update() {

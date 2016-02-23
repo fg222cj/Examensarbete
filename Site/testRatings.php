@@ -65,13 +65,14 @@ if(!empty($ratings)) {
         }
 
         $html .= "<div class='rating-box'>
+                    <div class='rating-info'>
                       <h3>" . $otherPlayer->getName()."</h3>";
 
         if(!empty($otherPlayerSlot)) {
             $html .= "<img src=\"{$heroRep->getHero($otherPlayerSlot->get('hero_id'))}\"/>";
         }
 
-        $html .= "<input type='hidden' name='players[]' value='" . $rating->getPlayerID() . "'/>";
+        $html .= "</div><input type='hidden' name='players[]' value='" . $rating->getPlayerID() . "'/>";
 
         for ($i = 1; $i <= 5; $i++) {
             $checkedClass = "";

@@ -41,6 +41,8 @@ h1 {
 
 h3 {
     display: inline-block;
+    -webkit-margin-after: 0;
+    -webkit-margin-end: 1em;
 }
 #login{
     font-size: 25px;
@@ -75,13 +77,8 @@ h3 {
 }
 
 .rating-box {
-    float: left;
     margin-left: 30px;
-}
-
-.rating-radio {
-    margin-left: 5px;
-    display: block;
+    clear:both;
 }
 
 input[type="submit"] {
@@ -94,7 +91,7 @@ input[type="submit"] {
 
 .rating-radio {
     float:left;
-    margin:25px 5px 0 0;
+    margin:0 5px 10px 0;
     width:100px;
     height:40px;
     position:relative;
