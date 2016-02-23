@@ -3,9 +3,10 @@
  */
 $(document).ready(setEvents);
 
+var form = new Form();
 function setEvents() {
     update();
-    setInterval(update, 1000);
+    setInterval(update, 5000);
 }
 
 function update() {
@@ -17,10 +18,14 @@ function update() {
         dataType: "html",
         data: { accountID: accountID }})
         .done(function(result) {
-            var newMatchID = $(result).find('input[name=match_id]');
+            //var newMatchID = $(result).find('input[name=match_id]');
+            var newRatingInputs = $(result).find('input[type=radio]');
+            var oldRatingInputs = $('input[type=radio]');
 
-            if(!newMatchID.exists() || $('input[name=match_id]').val() != newMatchID.val()) {
+            //if(!newMatchID.exists() || $('input[name=match_id]').val() != newMatchID.val()) {
+            if(newRatingInputs != oldRatingInputs) {
                 $('#ratings').html(result);
+                form.setBindings();
             }
         });
 

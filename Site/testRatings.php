@@ -48,7 +48,7 @@ $html = "";
 
 if(!empty($ratings)) {
     $html .= "<h2>Match ID: " . $ratings[0]->getMatchID() . "</h2>
-              <form action='index.php' method='post'>
+              <form action='index.php' method='post' name='rating-form'>
               <input type='hidden' name='match_id' value='" . $ratings[0]->getMatchID() . "' />";
 
 
@@ -60,17 +60,25 @@ if(!empty($ratings)) {
                       <h3>" . $otherPlayer->getName()."</h3>
                        <img src=\"{$heroRep->getHero($matchHistory->getHeroID())}\"/>
                       <input type='hidden' name='players[]' value='" . $rating->getPlayerID() . "'/>";
-        for($i = 5; $i >= 1; $i--) {
+
+        for ($i = 1; $i <= 5; $i++) {
+            $checkedClass = "";
+            $checkedAttribute = "";
+            if($rating->getRating() == $i) {
+                $checkedClass = " checked";
+                $checkedAttribute = " checked='checked'";
+            }
             $html .= "<div class='rating-radio'>
-                      <label for='rating_" . $rating->getPlayerID() . "_" . $i . "'>" . $i . "</label>
-                      <input type='radio' id='rating_" . $rating->getPlayerID() . "_" . $i . "' name='rating_" . $rating->getPlayerID() . "' value='" . $i . "'/>
-                      </div>";
+                  <input class='rate' type='radio' id='rating_" . $rating->getPlayerID() . "_" . $i . "' name='rating_" . $rating->getPlayerID() . "' value='" . $i . "'" . $checkedAttribute . "/>
+                  <label class='rate" . $checkedClass . "' for='rating_" . $rating->getPlayerID() . "_" . $i . "'>" . $i . "</label>
+                  </div>";
         }
+
         $html .= "</div>";
     }
 
     $html .= "<div class=\"clear\"></div>
-              <input type='submit' /></form>";
+              </form>";
 }
 else {
     $html .= "<p>No recent unrated matches, good job!</p>";

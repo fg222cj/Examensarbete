@@ -38,6 +38,10 @@ h1 {
     font-weight: 300;
     margin: 0 0 40px;
 }
+
+h3 {
+    display: inline-block;
+}
 #login{
     font-size: 25px;
 }
@@ -86,4 +90,44 @@ input[type="submit"] {
 
 .clear {
     clear: both;
+}
+
+.rating-radio {
+    float:left;
+    margin:25px 5px 0 0;
+    width:100px;
+    height:40px;
+    position:relative;
+    padding: 0;
+}
+
+.rating-radio label, .donate-now input {
+    display:block;
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+}
+
+.rating-radio input[type="radio"] {
+    opacity:0.01;
+    z-index:100;
+}
+
+.rating-radio input[type="radio"]:checked + label,
+.checked + label {
+    background:#DDD;
+}
+
+.rating-radio label {
+    padding:10px 5px;
+    border:1px solid #CCC;
+    cursor:pointer;
+    z-index:90;
+    text-align: center;
+}
+
+.rating-radio label:hover {
+    background:#DDD;
 }

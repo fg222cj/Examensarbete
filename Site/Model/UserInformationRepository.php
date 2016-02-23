@@ -10,9 +10,8 @@ require_once(dirname(__FILE__) . "/Repository.php");
 class userInformationRepository  extends Repository
 {
     public function getAll(){
-
         $db = $this->connection();
-        $sql= "SELECT * FROM " . DBTABLEJOCKEUSERS;
+        $sql= "SELECT * FROM " . DBTABLEUSERINFORMATION;
 
         $query = $db->prepare($sql);
         $query->execute();
@@ -26,10 +25,9 @@ class userInformationRepository  extends Repository
 
     }
     public function getUser($steam64){
-
         $db = $this->connection();
 
-        $sql = "SELECT * FROM " . DBTABLEJOCKEUSERS . " WHERE " . DBCOLUMNSTEAMID . "=? LIMIT 1";
+        $sql = "SELECT * FROM " . DBTABLEUSERINFORMATION . " WHERE " . DBCOLUMNSTEAMID . "=? LIMIT 1";
         $params = array($steam64);
 
         $query = $db->prepare($sql);
@@ -46,7 +44,7 @@ class userInformationRepository  extends Repository
 
     public function insert(UserInformation $userInfo) {
         $db = $this->connection();
-        $sql = "INSERT IGNORE INTO " . DBTABLEJOCKEUSERS . " (" . DBCOLUMNSTEAMID . ", " . DBCOLUMNPERSONANAME . ", " .
+        $sql = "INSERT IGNORE INTO " . DBTABLEUSERINFORMATION . " (" . DBCOLUMNSTEAMID . ", " . DBCOLUMNPERSONANAME . ", " .
             DBCOLUMNPROFILEURL . ", " . DBCOLUMNAVATARFULL . ") VALUES (?, ?, ?, ?)";
         $params = array($userInfo->getSteamID(), $userInfo->getPersonaname(), $userInfo->getProfileurl(), $userInfo->getAvatarfull());
         $query = $db->prepare($sql);

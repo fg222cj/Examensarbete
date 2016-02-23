@@ -78,10 +78,21 @@ class PlayerRatingRepository extends Repository {
         $result = $query->fetchAll();
 
         $ratings = array();
-        foreach($result as $row) {
-            if($row[DBCOLUMNRATING] != 0) {
-                return null;
+
+        // If player has finished rating all other players in the match, return null
+        $numberOfRated = 0;
+        for($i = 0; $i < count($result); $i++) {
+            if($result[$i][DBCOLUMNRATING] != 0) {
+                $numberOfRated++;
             }
+        }
+
+        if($numberOfRated == count($result)) {
+            return null;
+        }
+
+        // Otherwise, return an array of all ratings
+        foreach($result as $row) {
             $rating = new PlayerRating($row[DBCOLUMNMATCHID], $row[DBCOLUMNPLAYERID], $row[DBCOLUMNRATEDBYID], $row[DBCOLUMNRATING]);
             $ratings[] = $rating;
         }

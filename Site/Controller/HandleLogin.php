@@ -166,7 +166,6 @@ class HandleLogin
      * @return mixed
      */
     function playerInfo(){
-
         $profile = $this->get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$_SESSION['T2SteamID64']}");
 
         $steam_profile = json_decode($profile);
@@ -184,14 +183,13 @@ class HandleLogin
      * @param $playersSteamID
      * @return UserInformation
      */
-   public function getPlayerInfo($playersSteamID){
-
+    public function getPlayerInfo($playersSteamID){
        $userRepo = new UserInformationRepository();
        $d = $userRepo->getUser($playersSteamID);
         var_dump($d);
        return $d;
+    }
 
-   }
     public function setPlayerInfo($playersSteamID){
 
         $profile = $this->get_contents("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={$this->key}&steamids={$playersSteamID}");
@@ -246,8 +244,10 @@ class HandleLogin
             $ratedPlayers = $_POST['players'];
             foreach($ratedPlayers as $ratedPlayer) {
                 $ratingInputName = "rating_" . $ratedPlayer;
-                $rating = new PlayerRating($_POST['match_id'], $ratedPlayer, $player->getID(), $_POST[$ratingInputName]);
-                $playerRatingRepository->update($rating);
+                if(!empty($_POST[$ratingInputName])) {
+                    $rating = new PlayerRating($_POST['match_id'], $ratedPlayer, $player->getID(), $_POST[$ratingInputName]);
+                    $playerRatingRepository->update($rating);
+                }
             }
         }
 
@@ -281,6 +281,7 @@ class HandleLogin
             <head>
                 <link rel=\"stylesheet\"  href=\"mainCss.css\">
                 <script language=\"javascript\" type=\"text/javascript\" src=\"jquery-2.1.4.min.js\"></script>
+                <script language=\"javascript\" type=\"text/javascript\" src=\"form.js\"></script>
                 <script language=\"javascript\" type=\"text/javascript\" src=\"update.js\"></script>
             </head>
             <body>

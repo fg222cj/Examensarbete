@@ -31,9 +31,9 @@ define("DBCOLUMNRATEDBYID", "rated_by_id");
 define("DBCOLUMNRATING", "rating");
 
 /*
- *  Table: jocke_users
+ *  Table: user_information
  */
-define("DBTABLEJOCKEUSERS" , "jocke_users");
+define("DBTABLEUSERINFORMATION" , "user_information");
 define("DBCOLUMNSTEAMID", "steamid");
 define("DBCOLUMNPERSONANAME", "personaname");
 define("DBCOLUMNPROFILEURL", "profileurl");
