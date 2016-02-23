@@ -48,7 +48,7 @@ class userInformationRepository  extends Repository
             DBCOLUMNPROFILEURL . ", " . DBCOLUMNAVATARFULL . ") VALUES (?, ?, ?, ?)";
 
 
-        $sqlDuplicate = "SELECT * FROM ".DBTABLEJOCKEUSERS."  WHERE " . DBCOLUMNSTEAMID . " = ?";
+        $sqlDuplicate = "SELECT * FROM ".DBTABLEUSERINFORMATION."  WHERE " . DBCOLUMNSTEAMID . " = ?";
         $paramsDuplicate = array($userInfo);
         $queryDuplicate = $this->dbConnection->prepare($sqlDuplicate);
         $queryDuplicate->execute($paramsDuplicate);
