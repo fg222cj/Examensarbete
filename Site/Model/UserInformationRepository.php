@@ -49,7 +49,7 @@ class userInformationRepository  extends Repository
 
 
         $sqlDuplicate = "SELECT * FROM ".DBTABLEUSERINFORMATION."  WHERE " . DBCOLUMNSTEAMID . " = ?";
-        $paramsDuplicate = array($userInfo->getSteamID(), $userInfo->getPersonaname(), $userInfo->getProfileUrl(), $userInfo->getAvatarFull());
+        $paramsDuplicate = array($userInfo->getSteamID());
         $queryDuplicate = $this->dbConnection->prepare($sqlDuplicate);
         $queryDuplicate->execute($paramsDuplicate);
 
