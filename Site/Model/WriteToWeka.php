@@ -7,7 +7,6 @@
  */
 class WriteToWeka
 {
-
     function generateFile($name,$rating){
         $wekaFile = fopen(dirname(__FILE__) . "/../Resources/WekaAnalyze.txt", 'a+') or die("can't open file");
         fwrite($wekaFile, $name . "," . $rating ."\n");

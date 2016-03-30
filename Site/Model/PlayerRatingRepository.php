@@ -32,6 +32,25 @@ class PlayerRatingRepository extends Repository {
         $query->execute($params);
     }
 
+    public function getAll() {
+        $db = $this->connection();
+
+        $sql = "SELECT * FROM " . DBTABLEPLAYERRATINGS;
+
+        $query = $db->prepare($sql);
+        $query->execute();
+
+        $result = $query->fetchAll();
+
+        $ratings = array();
+
+        foreach($result as $row) {
+            $ratings[] = new PlayerRating($row[DBCOLUMNMATCHID], $row[DBCOLUMNPLAYERID], $row[DBCOLUMNRATEDBYID], $row[DBCOLUMNRATING]);
+        }
+
+        return $ratings;
+    }
+
     /*
      * Fetches the ID of the latest match the player has participated in but not yet rated.
      */
@@ -103,13 +122,12 @@ class PlayerRatingRepository extends Repository {
     public function getByPlayerIDAndMatchID($playerID, $matchID) {
         $db = $this->connection();
 
-        $sql = "SELECT * FROM " . DBTABLEPLAYERS . " WHERE " . DBCOLUMNPLAYERID . "=? AND " . DBCOLUMNMATCHID . "=? LIMIT 5";
+        $sql = "SELECT * FROM " . DBTABLEPLAYERRATINGS . " WHERE " . DBCOLUMNPLAYERID . "=? AND " . DBCOLUMNMATCHID . "=? LIMIT 5";
         $params = array($playerID, $matchID);
 
         $query = $db->prepare($sql);
         $query->execute($params);
         $result = $query->fetchAll();
-
         $ratings = array();
         foreach($result as $row) {
             $rating = new PlayerRating($row[DBCOLUMNMATCHID], $row[DBCOLUMNPLAYERID], $row[DBCOLUMNRATEDBYID], $row[DBCOLUMNRATING]);
