@@ -47,7 +47,7 @@ class Export {
                         $row[] = $player->getName();
                     }
                     else {
-                        $row[] = "";
+                        $row[] = "?";
                     }
                     // There are 4 reserved places for the ratings (one for each other player on the team) so we need to fill all of them with either the rating or an empty string (if unrated)
                     for($i = 0; $i < 5; $i++) {
@@ -55,7 +55,7 @@ class Export {
                             $row[] = $ratings[$i]->getRating();
                         }
                         else {
-                            $row[] = "";
+                            $row[] = "?";
                         }
                     }
                 }
