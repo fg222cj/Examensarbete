@@ -50,7 +50,7 @@ class Export {
                         $row[] = "?";
                     }
                     // There are 4 reserved places for the ratings (one for each other player on the team) so we need to fill all of them with either the rating or an empty string (if unrated)
-                    for($i = 0; $i < 5; $i++) {
+                    for($i = 0; $i < 4; $i++) {
                         if((isset($ratings[$i]) || array_key_exists($i, $ratings)) && $ratings[$i]->getRating() != 0) {
                             $row[] = $ratings[$i]->getRating();
                         }
