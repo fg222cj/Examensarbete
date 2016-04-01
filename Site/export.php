@@ -7,7 +7,9 @@
 
 require_once(dirname(__FILE__) . '/Model/Export.php');
 
-$path = dirname(__FILE__) . '/Resources/export.txt';
+$path = dirname(__FILE__) . '/Resources/export.arff';
 $export = new Export();
-file_put_contents($path, $export->exportAll());
-echo "Done!";
+$dump = $export->exportAll();
+file_put_contents($path, $dump);
+echo "Done!<br>";
+echo nl2br($dump);
