@@ -44,7 +44,7 @@ class Export {
                 $ratings = $this->playerRatingRepository->getByPlayerIDAndMatchID($playerID, $matchID);
                 if(is_array($ratings) && count($ratings) > 0) {
                     if(isset($player)) {
-                        $row[] = $player->getName();
+                        $row[] = "'" . $player->getName() . "'";
                     }
                     else {
                         $row[] = "?";
