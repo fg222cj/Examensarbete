@@ -63,7 +63,9 @@ class Export {
                             $row[] = "?";
                         }
                     }
-                    $averageRating = $ratingTotal / $submittedRatingsCount;
+                    if($submittedRatingsCount > 0) {
+                        $averageRating = $ratingTotal / $submittedRatingsCount;
+                    }
                 }
                 // If there are no ratings for this player then there is no need to create a row
                 else {
