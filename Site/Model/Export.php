@@ -25,7 +25,7 @@ class Export {
     }
 
     public function exportAll() {
-        set_time_limit(60);
+        set_time_limit(120);
         $rows = array();
         $matches = $this->matchesMapper->load();
         foreach($matches as $match) {
@@ -42,6 +42,9 @@ class Export {
                 $playerID = $player->getID();
                 $ratings = null;
                 $ratings = $this->playerRatingRepository->getByPlayerIDAndMatchID($playerID, $matchID);
+                $averageRating = "?";
+                $submittedRatingsCount = 0;
+                $ratingTotal = 0;
                 if(is_array($ratings) && count($ratings) > 0) {
                     if(isset($player)) {
                         $row[] = "'" . $player->getName() . "'";
@@ -53,16 +56,20 @@ class Export {
                     for($i = 0; $i < 4; $i++) {
                         if((isset($ratings[$i]) || array_key_exists($i, $ratings)) && $ratings[$i]->getRating() != 0) {
                             $row[] = $ratings[$i]->getRating();
+                            $ratingTotal += $ratings[$i]->getRating();
+                            $submittedRatingsCount++;
                         }
                         else {
                             $row[] = "?";
                         }
                     }
+                    $averageRating = $ratingTotal / $submittedRatingsCount;
                 }
                 // If there are no ratings for this player then there is no need to create a row
                 else {
                     continue;
                 }
+                $row[] = $averageRating;
 
                 $radiantWin = "FALSE";
                 if($match->get('radiant_win')) {
@@ -104,6 +111,7 @@ class Export {
         $export .= "@attribute 'Rating 2' numeric\n";
         $export .= "@attribute 'Rating 3' numeric\n";
         $export .= "@attribute 'Rating 4' numeric\n";
+        $export .= "@attribute 'Average Rating' numeric\n";
         $export .= "@attribute 'Match ID' numeric\n";
         $export .= "@attribute 'Radiant Win' {TRUE,FALSE}\n";
         $export .= "@attribute Duration numeric\n";
