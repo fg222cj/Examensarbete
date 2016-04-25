@@ -25,7 +25,7 @@ class Export {
     }
 
     public function exportAll() {
-        set_time_limit(240);
+        set_time_limit(2400);
         $rows = array();
         $matches = $this->matchesMapper->load();
         foreach($matches as $match) {
