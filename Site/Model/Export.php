@@ -24,86 +24,144 @@ class Export {
         Api::init(STEAMAPIKEY, array(DBHOST, DBUSERNAME, DBPASSWORD, DBDATABASE, ''));
     }
 
-    public function exportAll() {
-        set_time_limit(2400);
-        $rows = array();
-        $matches = $this->matchesMapper->load();
-        foreach($matches as $match) {
-            set_time_limit(60);
-            $matchID = $match->get('match_id');
-            $slots = $match->getAllSlots();
-            foreach($slots as $slot) {
-                $row = array();
-                $accountID = $slot->get('account_id');
-                $player = $this->playerRepository->getByAccountID($accountID);
-                if(empty($player)) {
-                    continue;
-                }
-                $playerID = $player->getID();
-                $ratings = null;
-                $ratings = $this->playerRatingRepository->getByPlayerIDAndMatchID($playerID, $matchID);
-                $averageRating = "?";
-                $submittedRatingsCount = 0;
-                $ratingTotal = 0;
-                if(is_array($ratings) && count($ratings) > 0) {
-                    if(isset($player)) {
-                        $row[] = "'" . $player->getName() . "'";
+    /*
+     * Takes two arguments, slot and match. Returns an array with slot and match data if ratings exist for the slot,
+     * otherwise returns null.
+     */
+    public function exportSlot($slot, $match, $asNominal = false) {
+        $row = array();
+        $accountID = $slot->get('account_id');
+        $player = $this->playerRepository->getByAccountID($accountID);
+        if(empty($player)) {
+            return null;
+        }
+
+        $playerID = $player->getID();
+        $matchID = $match->get('match_id');
+        $ratings = null;
+        $ratings = $this->playerRatingRepository->getByPlayerIDAndMatchID($playerID, $matchID);
+        $averageRating = "?";
+        $submittedRatingsCount = 0;
+        $ratingTotal = 0;
+        if(is_array($ratings) && count($ratings) > 0) {
+            if(isset($player)) {
+                $row[] = "'" . $player->getName() . "'";
+            }
+            else {
+                $row[] = "?";
+            }
+            // There are 4 reserved places for the ratings (one for each other player on the team) so we need to fill all of them with either the rating or an empty string (if unrated)
+            for($i = 0; $i < 4; $i++) {
+                if((isset($ratings[$i]) || array_key_exists($i, $ratings)) && $ratings[$i]->getRating() != 0) {
+                    if($asNominal) {
+                        $row[] = convertToNominal($ratings[$i]->getRating(), "RATING");
                     }
                     else {
-                        $row[] = "?";
+                        $row[] = $ratings[$i]->getRating();
                     }
-                    // There are 4 reserved places for the ratings (one for each other player on the team) so we need to fill all of them with either the rating or an empty string (if unrated)
-                    for($i = 0; $i < 4; $i++) {
-                        if((isset($ratings[$i]) || array_key_exists($i, $ratings)) && $ratings[$i]->getRating() != 0) {
-                            $row[] = $ratings[$i]->getRating();
-                            $ratingTotal += $ratings[$i]->getRating();
-                            $submittedRatingsCount++;
-                        }
-                        else {
-                            $row[] = "?";
-                        }
-                    }
-                    if($submittedRatingsCount > 0) {
-                        $averageRating = $ratingTotal / $submittedRatingsCount;
-                    }
+                    $ratingTotal += $ratings[$i]->getRating();
+                    $submittedRatingsCount++;
                 }
-                // If there are no ratings for this player then there is no need to create a row
                 else {
-                    continue;
+                    $row[] = "?";
                 }
-                $row[] = $averageRating;
+            }
+            if($submittedRatingsCount > 0) {
+                $averageRating = $ratingTotal / $submittedRatingsCount;
+            }
+        }
+        // If there are no ratings for this player then there is no need to create a row
+        else {
+            return null;
+        }
 
-                $radiantWin = "FALSE";
-                if($match->get('radiant_win')) {
-                    $radiantWin = "TRUE";
-                }
 
-                $row[] = $match->get('match_id');
-                $row[] = $radiantWin;
-                $row[] = $match->get('duration');
-                $row[] = $match->get('first_blood_time');
-                $row[] = $slot->get('hero_id');
-                $row[] = $slot->get('item_0');
-                $row[] = $slot->get('item_1');
-                $row[] = $slot->get('item_2');
-                $row[] = $slot->get('item_3');
-                $row[] = $slot->get('item_4');
-                $row[] = $slot->get('item_5');
-                $row[] = $slot->get('kills');
-                $row[] = $slot->get('deaths');
-                $row[] = $slot->get('assists');
-                $row[] = $slot->get('gold');
-                $row[] = $slot->get('last_hits');
-                $row[] = $slot->get('denies');
-                $row[] = $slot->get('gold_per_min');
-                $row[] = $slot->get('xp_per_min');
-                $row[] = $slot->get('gold_spent');
-                $row[] = $slot->get('hero_damage');
-                $row[] = $slot->get('tower_damage');
-                $row[] = $slot->get('hero_healing');
-                $row[] = $slot->get('level');
+        $radiantWin = "FALSE";
+        if($match->get('radiant_win')) {
+            $radiantWin = "TRUE";
+        }
 
-                $rows[] = implode(",", $row);
+        if($asNominal) {
+            $row[] = convertToNominal($ratings[$i]->getRating(), "RATING");
+            $row[] = convertToNominal($averageRating, "RATING");
+            $row[] = $match->get('match_id');
+            $row[] = $radiantWin;
+            $row[] = convertToNominal($match->get('duration'), "DURATION");
+            $row[] = convertToNominal($match->get('first_blood_time'), "FIRST_BLOOD_TIME");
+            $row[] = convertToNominal($slot->get('hero_id'), "HERO_ID");
+            $row[] = convertToNominal($slot->get('item_0'), "ITEM_ID");
+            $row[] = convertToNominal($slot->get('item_1'), "ITEM_ID");
+            $row[] = convertToNominal($slot->get('item_2'), "ITEM_ID");
+            $row[] = convertToNominal($slot->get('item_3'), "ITEM_ID");
+            $row[] = convertToNominal($slot->get('item_4'), "ITEM_ID");
+            $row[] = convertToNominal($slot->get('item_5'), "ITEM_ID");
+            $row[] = convertToNominal($slot->get('kills'), "KILLS");
+            $row[] = convertToNominal($slot->get('deaths'), "DEATHS");
+            $row[] = convertToNominal($slot->get('assists'), "ASSISTS");
+            $row[] = convertToNominal($slot->get('gold'), "GOLD");
+            $row[] = convertToNominal($slot->get('last_hits'), "LAST_HITS");
+            $row[] = convertToNominal($slot->get('denies'), "DENIES");
+            $row[] = convertToNominal($slot->get('gold_per_min'), "GOLD_PER_MIN");
+            $row[] = convertToNominal($slot->get('xp_per_min'), "XP_PER_MIN");
+            $row[] = convertToNominal($slot->get('gold_spent'), "GOLD_SPENT");
+            $row[] = convertToNominal($slot->get('hero_damage'), "HERO_DAMAGE");
+            $row[] = convertToNominal($slot->get('tower_damage'), "TOWER_DAMAGE");
+            $row[] = convertToNominal($slot->get('hero_healing'), "HERO_HEALING");
+            $row[] = convertToNominal($slot->get('level'), "LEVEL");
+        }
+        else {
+            $row[] = $averageRating;
+            $row[] = $match->get('match_id');
+            $row[] = $radiantWin;
+            $row[] = $match->get('duration');
+            $row[] = $match->get('first_blood_time');
+            $row[] = $slot->get('hero_id');
+            $row[] = $slot->get('item_0');
+            $row[] = $slot->get('item_1');
+            $row[] = $slot->get('item_2');
+            $row[] = $slot->get('item_3');
+            $row[] = $slot->get('item_4');
+            $row[] = $slot->get('item_5');
+            $row[] = $slot->get('kills');
+            $row[] = $slot->get('deaths');
+            $row[] = $slot->get('assists');
+            $row[] = $slot->get('gold');
+            $row[] = $slot->get('last_hits');
+            $row[] = $slot->get('denies');
+            $row[] = $slot->get('gold_per_min');
+            $row[] = $slot->get('xp_per_min');
+            $row[] = $slot->get('gold_spent');
+            $row[] = $slot->get('hero_damage');
+            $row[] = $slot->get('tower_damage');
+            $row[] = $slot->get('hero_healing');
+            $row[] = $slot->get('level');
+        }
+
+        return $row;
+    }
+
+    public function exportAllFromMatch($match, $asNominal = false) {
+        $rows = array();
+        set_time_limit(60);
+        $slots = $match->getAllSlots();
+        foreach($slots as $slot) {
+            $row = exportSlot($slot, $match, $asNominal);
+            if(isset($row)) {
+                $rows[] = $row;
+            }
+        }
+
+        return $rows;
+    }
+
+    public function exportAll($asNominal = false) {
+        set_time_limit(2400);
+        $result = array();
+        $matches = $this->matchesMapper->load();
+        foreach($matches as $match) {
+            $rows = exportAllFromMatch($match, $asNominal);
+            foreach($rows as $row) {
+                $result[] = implode(",", $row);
             }
         }
 
@@ -140,10 +198,292 @@ class Export {
         $export .= "@attribute Level numeric\n\n";
         $export .= "@data\n\n";
 
-        foreach($rows as $row) {
+        foreach($result as $row) {
             $export .= $row . "\n";
         }
 
         return $export;
+    }
+
+    public function convertToNominal($value, $type) {
+        $nominalValue = "?";
+        switch($type) {
+            case "RATING":
+                switch($value) {
+                    case 1:
+                        $nominalValue = "Very Low";
+                        break;
+                    case 2:
+                        $nominalValue = "Low";
+                        break;
+                    case 3:
+                        $nominalValue = "Average";
+                        break;
+                    case 4:
+                        $nominalValue = "High";
+                        break;
+                    case 5:
+                        $nominalValue = "Very High";
+                        break;
+                }
+                break;
+            case "DURATION":
+                if($value <= 1109) {
+                    $nominalValue = "Very Short";
+                }
+                elseif($value > 1109  && $value <= 2218) {
+                    $nominalValue = "Short";
+                }
+                elseif($value > 2218 && $value <= 3327) {
+                    $nominalValue = "Average";
+                }
+                elseif($value > 3327 && $value <= 4436) {
+                    $nominalValue = "Long";
+                }
+                elseif($value > 4436) {
+                    $nominalValue = "Very Long";
+                }
+                break;
+            case "FIRST_BLOOD_TIME":
+                if($value <= 180) {
+                    $nominalValue = "Early";
+                }
+                elseif($value > 180 && $value <= 360) {
+                    $nominalValue = "Average";
+                }
+                elseif($value > 360) {
+                    $nominalValue = "Late";
+                }
+                break;
+            case "HERO_ID":
+                // ToDo: Map each hero ID to a name here. Possible with Kronusme API?
+                $nominalValue = "?";
+                break;
+            case "ITEM_ID":
+                // ToDo: Map each item ID to a name here. Possible with Kronusme API?
+                break;
+            case "KILLS":
+                if($value <= 4) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value > 4  && $value <= 10) {
+                    $nominalValue = "Low";
+                }
+                elseif($value > 10 && $value <= 18) {
+                    $nominalValue = "Average";
+                }
+                elseif($value > 18 && $value <= 24) {
+                    $nominalValue = "High";
+                }
+                elseif($value > 24) {
+                    $nominalValue = "Very High";
+                }
+                break;
+            case "DEATHS":
+                if($value <= 3) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value > 3  && $value <= 7) {
+                    $nominalValue = "Low";
+                }
+                elseif($value > 7 && $value <= 13) {
+                    $nominalValue = "Average";
+                }
+                elseif($value > 13 && $value <= 17) {
+                    $nominalValue = "High";
+                }
+                elseif($value > 20) {
+                    $nominalValue = "Very High";
+                }
+                break;
+            case "ASSISTS":
+                if($value <= 5) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value > 5  && $value <= 12) {
+                    $nominalValue = "Low";
+                }
+                elseif($value > 12 && $value <= 21) {
+                    $nominalValue = "Average";
+                }
+                elseif($value > 21 && $value <= 28) {
+                    $nominalValue = "High";
+                }
+                elseif($value > 28) {
+                    $nominalValue = "Very High";
+                }
+                break;
+            case "GOLD":
+                if($value <= 1000) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value > 1000  && $value <= 2500) {
+                    $nominalValue = "Low";
+                }
+                elseif($value > 2500 && $value <= 5000) {
+                    $nominalValue = "Average";
+                }
+                elseif($value > 5000 && $value <= 6500) {
+                    $nominalValue = "High";
+                }
+                elseif($value > 6500) {
+                    $nominalValue = "Very High";
+                }
+                break;
+            case "LAST_HITS":
+                if($value <= 44) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value <= 90) {
+                    $nominalValue = "Low";
+                }
+                elseif($value <= 180) {
+                    $nominalValue = "Average";
+                }
+                elseif($value <= 270) {
+                    $nominalValue = "High";
+                }
+                elseif($value > 270) {
+                    $nominalValue = "Very High";
+                }
+                break;
+            case "DENIES":
+                if($value <= 3) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value <= 7) {
+                    $nominalValue = "Low";
+                }
+                elseif($value <= 12) {
+                    $nominalValue = "Average";
+                }
+                elseif($value <= 22) {
+                    $nominalValue = "High";
+                }
+                elseif($value > 22) {
+                    $nominalValue = "Very High";
+                }
+                break;
+            case "GOLD_PER_MIN":
+                if($value <= 200) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value <= 250) {
+                    $nominalValue = "Low";
+                }
+                elseif($value <= 450) {
+                    $nominalValue = "Average";
+                }
+                elseif($value <= 550) {
+                    $nominalValue = "High";
+                }
+                else {
+                    $nominalValue = "Very High";
+                }
+                break;
+            case "XP_PER_MIN":
+                if($value <= 200) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value <= 320) {
+                    $nominalValue = "Low";
+                }
+                elseif($value <= 440) {
+                    $nominalValue = "Average";
+                }
+                elseif($value <= 550) {
+                    $nominalValue = "High";
+                }
+                else {
+                    $nominalValue = "Very High";
+                }
+                break;
+            case "GOLD_SPENT":
+                if($value <= 4000) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value <= 6500) {
+                    $nominalValue = "Low";
+                }
+                elseif($value <= 12000) {
+                    $nominalValue = "Average";
+                }
+                elseif($value <= 18000) {
+                    $nominalValue = "High";
+                }
+                else {
+                    $nominalValue = "Very High";
+                }
+                break;
+            case "HERO_DAMAGE":
+                if($value <= 3000) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value <= 5500) {
+                    $nominalValue = "Low";
+                }
+                elseif($value <= 9500) {
+                    $nominalValue = "Average";
+                }
+                elseif($value <= 14000) {
+                    $nominalValue = "High";
+                }
+                else {
+                    $nominalValue = "Very High";
+                }
+                break;
+            case "TOWER_DAMAGE":
+                if($value <= 600) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value <= 1200) {
+                    $nominalValue = "Low";
+                }
+                elseif($value <= 2500) {
+                    $nominalValue = "Average";
+                }
+                elseif($value <= 3500) {
+                    $nominalValue = "High";
+                }
+                else {
+                    $nominalValue = "Very High";
+                }
+                break;
+            case "HERO_HEALING":
+                if($value <= 400) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value <= 950) {
+                    $nominalValue = "Low";
+                }
+                elseif($value <= 1600) {
+                    $nominalValue = "Average";
+                }
+                elseif($value <= 2500) {
+                    $nominalValue = "High";
+                }
+                else {
+                    $nominalValue = "Very High";
+                }
+                break;
+            case "LEVEL":
+                if($value <= 10) {
+                    $nominalValue = "Very Low";
+                }
+                elseif($value <= 15) {
+                    $nominalValue = "Low";
+                }
+                elseif($value <= 19) {
+                    $nominalValue = "Average";
+                }
+                elseif($value <= 23) {
+                    $nominalValue = "High";
+                }
+                else {
+                    $nominalValue = "Very High";
+                }
+                break;
+        }
+        return $nominalValue;
     }
 }
