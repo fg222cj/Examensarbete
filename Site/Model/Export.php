@@ -82,7 +82,6 @@ class Export {
         }
 
         if($asNominal) {
-            $row[] = $this->convertToNominal($ratings[$i]->getRating(), "RATING");
             $row[] = $this->convertToNominal($averageRating, "RATING");
             $row[] = $match->get('match_id');
             $row[] = $radiantWin;
