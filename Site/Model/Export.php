@@ -54,7 +54,7 @@ class Export {
             for($i = 0; $i < 4; $i++) {
                 if((isset($ratings[$i]) || array_key_exists($i, $ratings)) && $ratings[$i]->getRating() != 0) {
                     if($asNominal) {
-                        $row[] = convertToNominal($ratings[$i]->getRating(), "RATING");
+                        $row[] = $this->convertToNominal($ratings[$i]->getRating(), "RATING");
                     }
                     else {
                         $row[] = $ratings[$i]->getRating();
@@ -82,32 +82,32 @@ class Export {
         }
 
         if($asNominal) {
-            $row[] = convertToNominal($ratings[$i]->getRating(), "RATING");
-            $row[] = convertToNominal($averageRating, "RATING");
+            $row[] = $this->convertToNominal($ratings[$i]->getRating(), "RATING");
+            $row[] = $this->convertToNominal($averageRating, "RATING");
             $row[] = $match->get('match_id');
             $row[] = $radiantWin;
-            $row[] = convertToNominal($match->get('duration'), "DURATION");
-            $row[] = convertToNominal($match->get('first_blood_time'), "FIRST_BLOOD_TIME");
-            $row[] = convertToNominal($slot->get('hero_id'), "HERO_ID");
-            $row[] = convertToNominal($slot->get('item_0'), "ITEM_ID");
-            $row[] = convertToNominal($slot->get('item_1'), "ITEM_ID");
-            $row[] = convertToNominal($slot->get('item_2'), "ITEM_ID");
-            $row[] = convertToNominal($slot->get('item_3'), "ITEM_ID");
-            $row[] = convertToNominal($slot->get('item_4'), "ITEM_ID");
-            $row[] = convertToNominal($slot->get('item_5'), "ITEM_ID");
-            $row[] = convertToNominal($slot->get('kills'), "KILLS");
-            $row[] = convertToNominal($slot->get('deaths'), "DEATHS");
-            $row[] = convertToNominal($slot->get('assists'), "ASSISTS");
-            $row[] = convertToNominal($slot->get('gold'), "GOLD");
-            $row[] = convertToNominal($slot->get('last_hits'), "LAST_HITS");
-            $row[] = convertToNominal($slot->get('denies'), "DENIES");
-            $row[] = convertToNominal($slot->get('gold_per_min'), "GOLD_PER_MIN");
-            $row[] = convertToNominal($slot->get('xp_per_min'), "XP_PER_MIN");
-            $row[] = convertToNominal($slot->get('gold_spent'), "GOLD_SPENT");
-            $row[] = convertToNominal($slot->get('hero_damage'), "HERO_DAMAGE");
-            $row[] = convertToNominal($slot->get('tower_damage'), "TOWER_DAMAGE");
-            $row[] = convertToNominal($slot->get('hero_healing'), "HERO_HEALING");
-            $row[] = convertToNominal($slot->get('level'), "LEVEL");
+            $row[] = $this->convertToNominal($match->get('duration'), "DURATION");
+            $row[] = $this->convertToNominal($match->get('first_blood_time'), "FIRST_BLOOD_TIME");
+            $row[] = $this->convertToNominal($slot->get('hero_id'), "HERO_ID");
+            $row[] = $this->convertToNominal($slot->get('item_0'), "ITEM_ID");
+            $row[] = $this->convertToNominal($slot->get('item_1'), "ITEM_ID");
+            $row[] = $this->convertToNominal($slot->get('item_2'), "ITEM_ID");
+            $row[] = $this->convertToNominal($slot->get('item_3'), "ITEM_ID");
+            $row[] = $this->convertToNominal($slot->get('item_4'), "ITEM_ID");
+            $row[] = $this->convertToNominal($slot->get('item_5'), "ITEM_ID");
+            $row[] = $this->convertToNominal($slot->get('kills'), "KILLS");
+            $row[] = $this->convertToNominal($slot->get('deaths'), "DEATHS");
+            $row[] = $this->convertToNominal($slot->get('assists'), "ASSISTS");
+            $row[] = $this->convertToNominal($slot->get('gold'), "GOLD");
+            $row[] = $this->convertToNominal($slot->get('last_hits'), "LAST_HITS");
+            $row[] = $this->convertToNominal($slot->get('denies'), "DENIES");
+            $row[] = $this->convertToNominal($slot->get('gold_per_min'), "GOLD_PER_MIN");
+            $row[] = $this->convertToNominal($slot->get('xp_per_min'), "XP_PER_MIN");
+            $row[] = $this->convertToNominal($slot->get('gold_spent'), "GOLD_SPENT");
+            $row[] = $this->convertToNominal($slot->get('hero_damage'), "HERO_DAMAGE");
+            $row[] = $this->convertToNominal($slot->get('tower_damage'), "TOWER_DAMAGE");
+            $row[] = $this->convertToNominal($slot->get('hero_healing'), "HERO_HEALING");
+            $row[] = $this->convertToNominal($slot->get('level'), "LEVEL");
         }
         else {
             $row[] = $averageRating;
@@ -145,7 +145,7 @@ class Export {
         set_time_limit(60);
         $slots = $match->getAllSlots();
         foreach($slots as $slot) {
-            $row = exportSlot($slot, $match, $asNominal);
+            $row = $this->exportSlot($slot, $match, $asNominal);
             if(isset($row)) {
                 $rows[] = $row;
             }
@@ -159,7 +159,7 @@ class Export {
         $result = array();
         $matches = $this->matchesMapper->load();
         foreach($matches as $match) {
-            $rows = exportAllFromMatch($match, $asNominal);
+            $rows = $this->exportAllFromMatch($match, $asNominal);
             foreach($rows as $row) {
                 $result[] = implode(",", $row);
             }
