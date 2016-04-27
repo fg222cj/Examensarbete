@@ -164,17 +164,21 @@ class Export {
             }
         }
 
+        $valueType = "numeric";
+        if($asNominal) {
+            $valueType = "nominal";
+        }
         $export = "@relation statistics\n\n";
         $export .= "@attribute Name string\n";
-        $export .= "@attribute 'Rating 1' numeric\n";
-        $export .= "@attribute 'Rating 2' numeric\n";
-        $export .= "@attribute 'Rating 3' numeric\n";
-        $export .= "@attribute 'Rating 4' numeric\n";
-        $export .= "@attribute 'Average Rating' numeric\n";
+        $export .= "@attribute 'Rating 1' " . $valueType . "\n";
+        $export .= "@attribute 'Rating 2' " . $valueType . "\n";
+        $export .= "@attribute 'Rating 3' " . $valueType . "\n";
+        $export .= "@attribute 'Rating 4' " . $valueType . "\n";
+        $export .= "@attribute 'Average Rating' " . $valueType . "\n";
         $export .= "@attribute 'Match ID' numeric\n";
         $export .= "@attribute 'Radiant Win' {TRUE,FALSE}\n";
-        $export .= "@attribute Duration numeric\n";
-        $export .= "@attribute 'First blood time' numeric\n";
+        $export .= "@attribute Duration " . $valueType . "\n";
+        $export .= "@attribute 'First blood time' " . $valueType . "\n";
         $export .= "@attribute 'Hero ID' numeric\n";
         $export .= "@attribute 'Item 0' numeric\n";
         $export .= "@attribute 'Item 1' numeric\n";
@@ -182,19 +186,19 @@ class Export {
         $export .= "@attribute 'Item 3' numeric\n";
         $export .= "@attribute 'Item 4' numeric\n";
         $export .= "@attribute 'Item 5' numeric\n";
-        $export .= "@attribute Kills numeric\n";
-        $export .= "@attribute Deaths numeric\n";
-        $export .= "@attribute Assists numeric\n";
-        $export .= "@attribute Gold numeric\n";
-        $export .= "@attribute 'Last hits' numeric\n";
-        $export .= "@attribute Denies numeric\n";
-        $export .= "@attribute 'Gold per minute' numeric\n";
-        $export .= "@attribute 'XP per minute' numeric\n";
-        $export .= "@attribute 'Gold spent' numeric\n";
-        $export .= "@attribute 'Hero damage' numeric\n";
-        $export .= "@attribute 'Tower damage' numeric\n";
-        $export .= "@attribute 'Hero healing' numeric\n";
-        $export .= "@attribute Level numeric\n\n";
+        $export .= "@attribute Kills " . $valueType . "\n";
+        $export .= "@attribute Deaths " . $valueType . "\n";
+        $export .= "@attribute Assists " . $valueType . "\n";
+        $export .= "@attribute Gold " . $valueType . "\n";
+        $export .= "@attribute 'Last hits' " . $valueType . "\n";
+        $export .= "@attribute Denies " . $valueType . "\n";
+        $export .= "@attribute 'Gold per minute' " . $valueType . "\n";
+        $export .= "@attribute 'XP per minute' " . $valueType . "\n";
+        $export .= "@attribute 'Gold spent' " . $valueType . "\n";
+        $export .= "@attribute 'Hero damage' " . $valueType . "\n";
+        $export .= "@attribute 'Tower damage' " . $valueType . "\n";
+        $export .= "@attribute 'Hero healing' " . $valueType . "\n";
+        $export .= "@attribute Level " . $valueType . "\n\n";
         $export .= "@data\n\n";
 
         foreach($result as $row) {
