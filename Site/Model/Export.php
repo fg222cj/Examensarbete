@@ -164,41 +164,74 @@ class Export {
             }
         }
 
-        $valueType = "numeric";
-        if($asNominal) {
-            $valueType = "nominal";
-        }
         $export = "@relation statistics\n\n";
-        $export .= "@attribute Name string\n";
-        $export .= "@attribute 'Rating 1' " . $valueType . "\n";
-        $export .= "@attribute 'Rating 2' " . $valueType . "\n";
-        $export .= "@attribute 'Rating 3' " . $valueType . "\n";
-        $export .= "@attribute 'Rating 4' " . $valueType . "\n";
-        $export .= "@attribute 'Average Rating' " . $valueType . "\n";
-        $export .= "@attribute 'Match ID' numeric\n";
-        $export .= "@attribute 'Radiant Win' {TRUE,FALSE}\n";
-        $export .= "@attribute Duration " . $valueType . "\n";
-        $export .= "@attribute 'First blood time' " . $valueType . "\n";
-        $export .= "@attribute 'Hero ID' numeric\n";
-        $export .= "@attribute 'Item 0' numeric\n";
-        $export .= "@attribute 'Item 1' numeric\n";
-        $export .= "@attribute 'Item 2' numeric\n";
-        $export .= "@attribute 'Item 3' numeric\n";
-        $export .= "@attribute 'Item 4' numeric\n";
-        $export .= "@attribute 'Item 5' numeric\n";
-        $export .= "@attribute Kills " . $valueType . "\n";
-        $export .= "@attribute Deaths " . $valueType . "\n";
-        $export .= "@attribute Assists " . $valueType . "\n";
-        $export .= "@attribute Gold " . $valueType . "\n";
-        $export .= "@attribute 'Last hits' " . $valueType . "\n";
-        $export .= "@attribute Denies " . $valueType . "\n";
-        $export .= "@attribute 'Gold per minute' " . $valueType . "\n";
-        $export .= "@attribute 'XP per minute' " . $valueType . "\n";
-        $export .= "@attribute 'Gold spent' " . $valueType . "\n";
-        $export .= "@attribute 'Hero damage' " . $valueType . "\n";
-        $export .= "@attribute 'Tower damage' " . $valueType . "\n";
-        $export .= "@attribute 'Hero healing' " . $valueType . "\n";
-        $export .= "@attribute Level " . $valueType . "\n\n";
+
+        if($asNominal) {
+            $export .= "@attribute Name string\n";
+            $export .= "@attribute 'Rating 1' {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute 'Rating 2' {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute 'Rating 3' {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute 'Rating 4' {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute 'Average Rating' {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute 'Match ID' numeric\n";
+            $export .= "@attribute 'Radiant Win' {TRUE,FALSE}\n";
+            $export .= "@attribute Duration {'Very Short',Short,Average,Long,'Very Long'}\n";
+            $export .= "@attribute 'First blood time' {Early,Average,Late}\n";
+            $export .= "@attribute 'Hero ID' numeric\n";
+            $export .= "@attribute 'Item 0' numeric\n";
+            $export .= "@attribute 'Item 1' numeric\n";
+            $export .= "@attribute 'Item 2' numeric\n";
+            $export .= "@attribute 'Item 3' numeric\n";
+            $export .= "@attribute 'Item 4' numeric\n";
+            $export .= "@attribute 'Item 5' numeric\n";
+            $export .= "@attribute Kills {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute Deaths {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute Assists {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute Gold {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute 'Last hits' {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute Denies {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute 'Gold per minute' {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute 'XP per minute' {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute 'Gold spent' {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute 'Hero damage' {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute 'Tower damage' {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute 'Hero healing' {'Very Low',Low,Average,High,'Very High'}\n";
+            $export .= "@attribute Level {'Very Low',Low,Average,High,'Very High'}\n\n";
+        }
+        else {
+            $export .= "@attribute Name string\n";
+            $export .= "@attribute 'Rating 1' numeric\n";
+            $export .= "@attribute 'Rating 2' numeric\n";
+            $export .= "@attribute 'Rating 3' numeric\n";
+            $export .= "@attribute 'Rating 4' numeric\n";
+            $export .= "@attribute 'Average Rating' numeric\n";
+            $export .= "@attribute 'Match ID' numeric\n";
+            $export .= "@attribute 'Radiant Win' {TRUE,FALSE}\n";
+            $export .= "@attribute Duration numeric\n";
+            $export .= "@attribute 'First blood time' numeric\n";
+            $export .= "@attribute 'Hero ID' numeric\n";
+            $export .= "@attribute 'Item 0' numeric\n";
+            $export .= "@attribute 'Item 1' numeric\n";
+            $export .= "@attribute 'Item 2' numeric\n";
+            $export .= "@attribute 'Item 3' numeric\n";
+            $export .= "@attribute 'Item 4' numeric\n";
+            $export .= "@attribute 'Item 5' numeric\n";
+            $export .= "@attribute Kills numeric\n";
+            $export .= "@attribute Deaths numeric\n";
+            $export .= "@attribute Assists numeric\n";
+            $export .= "@attribute Gold numeric\n";
+            $export .= "@attribute 'Last hits' numeric\n";
+            $export .= "@attribute Denies numeric\n";
+            $export .= "@attribute 'Gold per minute' numeric\n";
+            $export .= "@attribute 'XP per minute' numeric\n";
+            $export .= "@attribute 'Gold spent' numeric\n";
+            $export .= "@attribute 'Hero damage' numeric\n";
+            $export .= "@attribute 'Tower damage' numeric\n";
+            $export .= "@attribute 'Hero healing' numeric\n";
+            $export .= "@attribute Level numeric\n\n";
+        }
+
+
         $export .= "@data\n\n";
 
         foreach($result as $row) {
@@ -214,7 +247,7 @@ class Export {
             case "RATING":
                 switch($value) {
                     case 1:
-                        $nominalValue = "Very Low";
+                        $nominalValue = "'Very Low'";
                         break;
                     case 2:
                         $nominalValue = "Low";
@@ -226,13 +259,13 @@ class Export {
                         $nominalValue = "High";
                         break;
                     case 5:
-                        $nominalValue = "Very High";
+                        $nominalValue = "'Very High'";
                         break;
                 }
                 break;
             case "DURATION":
                 if($value <= 1109) {
-                    $nominalValue = "Very Short";
+                    $nominalValue = "'Very Short'";
                 }
                 elseif($value > 1109  && $value <= 2218) {
                     $nominalValue = "Short";
@@ -244,7 +277,7 @@ class Export {
                     $nominalValue = "Long";
                 }
                 elseif($value > 4436) {
-                    $nominalValue = "Very Long";
+                    $nominalValue = "'Very Long'";
                 }
                 break;
             case "FIRST_BLOOD_TIME":
@@ -267,7 +300,7 @@ class Export {
                 break;
             case "KILLS":
                 if($value <= 4) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value > 4  && $value <= 10) {
                     $nominalValue = "Low";
@@ -279,12 +312,12 @@ class Export {
                     $nominalValue = "High";
                 }
                 elseif($value > 24) {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
             case "DEATHS":
                 if($value <= 3) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value > 3  && $value <= 7) {
                     $nominalValue = "Low";
@@ -296,12 +329,12 @@ class Export {
                     $nominalValue = "High";
                 }
                 elseif($value > 20) {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
             case "ASSISTS":
                 if($value <= 5) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value > 5  && $value <= 12) {
                     $nominalValue = "Low";
@@ -313,12 +346,12 @@ class Export {
                     $nominalValue = "High";
                 }
                 elseif($value > 28) {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
             case "GOLD":
                 if($value <= 1000) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value > 1000  && $value <= 2500) {
                     $nominalValue = "Low";
@@ -330,12 +363,12 @@ class Export {
                     $nominalValue = "High";
                 }
                 elseif($value > 6500) {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
             case "LAST_HITS":
                 if($value <= 44) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value <= 90) {
                     $nominalValue = "Low";
@@ -347,12 +380,12 @@ class Export {
                     $nominalValue = "High";
                 }
                 elseif($value > 270) {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
             case "DENIES":
                 if($value <= 3) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value <= 7) {
                     $nominalValue = "Low";
@@ -364,12 +397,12 @@ class Export {
                     $nominalValue = "High";
                 }
                 elseif($value > 22) {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
             case "GOLD_PER_MIN":
                 if($value <= 200) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value <= 250) {
                     $nominalValue = "Low";
@@ -381,12 +414,12 @@ class Export {
                     $nominalValue = "High";
                 }
                 else {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
             case "XP_PER_MIN":
                 if($value <= 200) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value <= 320) {
                     $nominalValue = "Low";
@@ -398,12 +431,12 @@ class Export {
                     $nominalValue = "High";
                 }
                 else {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
             case "GOLD_SPENT":
                 if($value <= 4000) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value <= 6500) {
                     $nominalValue = "Low";
@@ -415,12 +448,12 @@ class Export {
                     $nominalValue = "High";
                 }
                 else {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
             case "HERO_DAMAGE":
                 if($value <= 3000) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value <= 5500) {
                     $nominalValue = "Low";
@@ -432,12 +465,12 @@ class Export {
                     $nominalValue = "High";
                 }
                 else {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
             case "TOWER_DAMAGE":
                 if($value <= 600) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value <= 1200) {
                     $nominalValue = "Low";
@@ -449,12 +482,12 @@ class Export {
                     $nominalValue = "High";
                 }
                 else {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
             case "HERO_HEALING":
                 if($value <= 400) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value <= 950) {
                     $nominalValue = "Low";
@@ -466,12 +499,12 @@ class Export {
                     $nominalValue = "High";
                 }
                 else {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
             case "LEVEL":
                 if($value <= 10) {
-                    $nominalValue = "Very Low";
+                    $nominalValue = "'Very Low'";
                 }
                 elseif($value <= 15) {
                     $nominalValue = "Low";
@@ -483,7 +516,7 @@ class Export {
                     $nominalValue = "High";
                 }
                 else {
-                    $nominalValue = "Very High";
+                    $nominalValue = "'Very High'";
                 }
                 break;
         }
